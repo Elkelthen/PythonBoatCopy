@@ -8,8 +8,8 @@ from DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
 
 #Set up a servo.
-servoX = 22
-servoY = 23
+servoX = 12
+servoY = 13
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(servoX,GPIO.OUT)
 GPIO.setup(servoY,GPIO.OUT)
@@ -36,11 +36,12 @@ pid.output_limits = (0, 50)
     
 
 while(True):
+    time.sleep(.5)
     #DAQ
-    acc = AccelCompass.getAccelAll()
+    #acc = AccelCompass.getAccelAll()
     heading = AccelCompass.getCompassHeading()
     #OUTPUT TO COMMAND LINE
-    print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" %(acc[0],acc[1],acc[2]))
+    #print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" %(acc[0],acc[1],acc[2]))
     print("Heading %.3f degrees\n" %(heading))
     #DAQ
     GPS.read()
@@ -48,6 +49,7 @@ while(True):
     currentLong = GPS.getLong()
     print("Lat: %.3fg \t Long: %.3fg" %(GPS.getLat(),GPS.getLong()))
     #OUTPUT TO MOTORS
+    #MotorControlX.move(90)
     AMC.setThrustDirection(heading, 10, 10, currentLat, currentLong, MotorControlX, MotorControlY)
-    AMC.setThrustSpeed(10, 10, pid, currentLong, currentLat, ESC)
+    #AMC.setThrustSpeed(10, 10, pid, currentLong, currentLat, ESC)
 

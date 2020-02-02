@@ -91,11 +91,11 @@ class GPS:
 
     #Read data from the GPS
     def read(self): 
-        while True:
-            GPS.inp=ser.readline()
-            if GPS.inp[:6] =='$GPGGA': # GGA data , packet 1, has all the data we need
-                break
-            time.sleep(0.1)     #without the cmd program will crash
+
+        GPS.inp=ser.readline()
+        #if GPS.inp[:6] =='$GPGGA': # GGA data , packet 1, has all the data we need
+            #break
+        time.sleep(0.1)     #without the cmd program will crash
         try:
             ind=GPS.inp.index('$GPGGA',5,len(GPS.inp))  #Sometimes multiple GPS data packets come into the stream. Take the data only after the last '$GPGGA' is seen
             GPS.inp=GPS.inp[ind:]
@@ -106,12 +106,6 @@ class GPS:
         
     #Split the data into individual elements
     def vals(self):
-        if enable_debug:
-            #print(GPS.GGA)
-            pass
-            
-        time=GPS.GGA[1]
-        
         if GPS.GGA[2]=='':  # latitude. Technically a float
             lat =-1.0
         else:
@@ -155,7 +149,7 @@ class GPS:
     def getLatLong(self):
         try:
             x=self.read()  #Read from GPS
-            [t,fix,sats,alt,lat,lat_ns,longitude,long_ew]=self.vals()  #Get the individial values
+            [alt,lat,lat_ns,longitude,long_ew]=self.vals()  #Get the individial values
                 
             # Convert to decimal degrees
             if lat !=-1.0:
