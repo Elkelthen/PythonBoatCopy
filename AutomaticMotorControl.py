@@ -38,7 +38,8 @@ def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
     print(output)
 
     #NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-    output = (((output - 0) * (2000 - 1000)) / (100 - 0)) + 1000
+    output = (((output - 0) * (1000 - 2000)) / (100 - 0)) + 2000
+    #output = abs(output)
     
     print(output)
     

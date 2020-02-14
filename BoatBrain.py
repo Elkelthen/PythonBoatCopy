@@ -32,11 +32,11 @@ ESC.reset()
 GPS = GPS()
     
 #PID CONTROLLER
-pid = PID(0, 0, 1, setpoint = 1000)
+pid = PID(10, 0, 75, setpoint = 0)
 pid.output_limits = (0, 100)
     
 
-for i in numpy.arange(-0.99,-1.00,-0.001):
+for i in numpy.arange(-0.9999,-1.0000,-0.00001):
 #while(True):
     try:
         time.sleep(1)
