@@ -1,4 +1,5 @@
 import math
+import geopy.distance
 
 
 #PseudoCode for thrust direction. This will first require the accelerometer for headings.
@@ -22,24 +23,22 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     ServoY.move(thrustVectorY)
     
 def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
-    directionVectorX = goToCoordsX - latitude
-    directionVectorY = goToCoordsY - longitude
     
-    distanceFromWaypoint = math.sqrt(math.pow(directionVectorX, 2) + math.pow(directionVectorY, 2))
+    coords1 = (goToCoordsX, goToCoordsY)
+    coords2 = (latitude, longitude)
     
-    print(distanceFromWaypoint)
+    print(coords1, coords2)
 
-    output = abs(pid(distanceFromWaypoint))
+    distMeters = geopy.distance.distance(coords1, coords2).m
+    
+    print(distMeters)
+
+    output = abs(pid(distMeters))
     
     print(output)
-    
-    if output > 100:
-        output = 100
-        
-    print(output)
-    
+
     #NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-    output = (((output - 0) * (2500 - 500)) / (100 - 0)) + 500
+    output = (((output - 0) * (2000 - 1000)) / (100 - 0)) + 1000
     
     print(output)
     
