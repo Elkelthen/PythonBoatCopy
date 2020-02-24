@@ -1,5 +1,5 @@
 import math
-import geopy.distance
+#import geopy.distance
 
 
 #PseudoCode for thrust direction. This will first require the accelerometer for headings.
@@ -29,11 +29,12 @@ def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
     
     print(coords1, coords2)
 
-    distMeters = geopy.distance.distance(coords1, coords2).m
+    #distMeters = geopy.distance.distance(coords1, coords2).m
     
-    print(distMeters)
+    #print(distMeters)
 
-    output = abs(pid(distMeters))
+    #output = abs(pid(distMeters))
+    output = 0
     
     print(output)
 

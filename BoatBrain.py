@@ -9,9 +9,9 @@ from simple_pid import PID
 import numpy
 
 #Set up a servo.
-servoX = 12
-servoY = 5
-GPIO.setmode(GPIO.BOARD)
+servoX = 17
+servoY = 27
+GPIO.setmode(GPIO.BCM)
 GPIO.setup(servoX,GPIO.OUT)
 GPIO.setup(servoY,GPIO.OUT)
 pi = pigpio.pi()
@@ -28,39 +28,33 @@ ESC = ESC(4,pi)
 ESC.reset()
 
 #Initialize Accel/Compass and GPS
-#AccelCompass = AccelerometerCompass()
+AccelCompass = AccelerometerCompass()
 GPS = GPS()
     
 #PID CONTROLLER
 pid = PID(10, 0, 75, setpoint = 0)
 pid.output_limits = (0, 100)
     
-
-for i in numpy.arange(-0.9999,-1.0000,-0.00001):
-#while(True):
+while(True):
     try:
         time.sleep(1)
         #DAQ
-        #acc = AccelCompass.getAccelAll()
-        #heading = AccelCompass.getCompassHeading()
+        acc = AccelCompass.getAccelAll()
+        heading = AccelCompass.getCompassHeading()
         #OUTPUT TO COMMAND LINE
-        #print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" %(acc[0],acc[1],acc[2]))
-        #print("Heading %.3f degrees\n" %(heading))
+        print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" %(acc[0],acc[1],acc[2]))
+        print("Heading %.3f degrees\n" %(heading))
         #DAQ
         GPS.read()
         currentLat = GPS.getLat()
         currentLong = GPS.getLong()
         print("Lat: %.3fg \t Long: %.3fg" %(GPS.getLat(),GPS.getLong()))
         #OUTPUT TO MOTORS
-        #MotorControlX.move(90)
-        #AMC.setThrustDirection(heading, 10, 10, currentLat, currentLong, MotorControlX, MotorControlY)
-        futureLong = i
-        futureLat = i
-        AMC.setThrustSpeed(futureLong, futureLat, pid, currentLong, currentLat, ESC)
-        #for i in range(0,10):
+        MotorControlX.move(90)
+        AMC.setThrustDirection(heading, 10, 10, currentLat, currentLong, MotorControlX, MotorControlY)
+        AMC.setThrustSpeed(10, 10, pid, currentLong, currentLat, ESC)
             
         
     except:
         GPIO.cleanup()
         exit()
-
