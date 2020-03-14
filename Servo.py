@@ -18,7 +18,7 @@ class Servo():
         
     #Set servo to 0 degrees
     def reset(self):
-        self.servo.start(2.0)
+        self.servo.start(4.5)
         
     #Move to the degree location (0 - 180).
     def move(self, deg):

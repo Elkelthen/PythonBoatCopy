@@ -50,7 +50,7 @@ while(True):
         currentLong = GPS.getLong()
         print("Lat: %.3fg \t Long: %.3fg" %(GPS.getLat(),GPS.getLong()))
         #OUTPUT TO MOTORS
-        MotorControlX.move(90)
+        #MotorControlX.move(90)
         AMC.setThrustDirection(heading, 10, 10, currentLat, currentLong, MotorControlX, MotorControlY)
         AMC.setThrustSpeed(10, 10, pid, currentLong, currentLat, ESC)
             

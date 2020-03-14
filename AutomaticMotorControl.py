@@ -16,8 +16,8 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     thrustVectorX = 30 * math.sin(theta)
     thrustVectorY = 30 * math.cos(theta)
     
-    #thrustVectorX = (((thrustVectorX - 0) * (115 - 75)) / (360 - 0)) + 75
-    #thrustVectorY = (((thrustVectorY - 0) * (115 - 75)) / (360 - 0)) + 75
+    thrustVectorX = (((thrustVectorX - 0) * (180 - 75)) / (360 - 0)) + 75
+    thrustVectorY = (((thrustVectorY - 0) * (180 - 75)) / (360 - 0)) + 75
     
     ServoX.move(thrustVectorX)
     ServoY.move(thrustVectorY)
