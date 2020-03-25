@@ -6,7 +6,10 @@ from Servo import Servo
 from ESC import ESC
 from DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
+from BluetoothComms import BluetoothComms as BC
 import numpy
+
+
 
 #Set up a servo.
 servoX = 17
@@ -35,9 +38,33 @@ GPS = GPS()
 pid = PID(10, 0, 75, setpoint = 0)
 pid.output_limits = (0, 100)
     
+
+xCoord = 10
+yCoord = 10
+
+
+
 while(True):
     try:
+        #Bluetooth Serial Comms
+        bc = BC()
+    except:
+        print("No device")
+    
+    try:
         time.sleep(1)
+        print("\n\n\n\n\n")
+        #Read input from Bluetooth Comms
+        try:
+            print("Trying")
+            read = bc.read().split(" ")
+            xCoord = int(read[0])
+            yCoord = int(read[1])
+            print(xCoord)
+            print(yCoord)
+        except:
+            print("No (new) values from bluetooth")
+
         #DAQ
         acc = AccelCompass.getAccelAll()
         heading = AccelCompass.getCompassHeading()
@@ -51,9 +78,8 @@ while(True):
         print("Lat: %.3fg \t Long: %.3fg" %(GPS.getLat(),GPS.getLong()))
         #OUTPUT TO MOTORS
         #MotorControlX.move(90)
-        AMC.setThrustDirection(heading, 10, 10, currentLat, currentLong, MotorControlX, MotorControlY)
-        AMC.setThrustSpeed(10, 10, pid, currentLong, currentLat, ESC)
-            
+        AMC.setThrustDirection(heading, xCoord, yCoord, currentLat, currentLong, MotorControlX, MotorControlY)
+        AMC.setThrustSpeed(xCoord, yCoord, pid, currentLong, currentLat, ESC)
         
     except:
         GPIO.cleanup()
