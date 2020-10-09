@@ -6,7 +6,7 @@ from Servo import Servo
 from ESC import ESC
 from DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
-from BluetoothComms import BluetoothComms as BC
+#from BluetoothComms import BluetoothComms as BC
 import numpy
 
 

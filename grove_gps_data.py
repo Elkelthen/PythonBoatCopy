@@ -62,7 +62,7 @@ enable_save_to_file=0
 #   print("Disable IR receiver before continuing")
 #   exit()
     
-ser = serial.Serial('/dev/ttyS0',  9600, timeout = 0)   #Open the serial port at 9600 baud
+ser = serial.Serial('/dev/tty0',  9600, timeout = 0)   #Open the serial port at 9600 baud
 ser.flush()
 
 def cleanstr(in_str):
