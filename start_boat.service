@@ -1,0 +1,10 @@
+[Unit]
+Description = "Start boat"
+
+[Service]
+ExecStart=/bin/bash /home/pi/Desktop/PythonBoat/start_boat.sh
+
+[Install]
+WantedBy=multi-user.target
+Alias=start_boat.service
+
