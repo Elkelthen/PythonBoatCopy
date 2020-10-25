@@ -6,7 +6,7 @@ from Servo import Servo
 from ESC import ESC
 from DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
-#from BluetoothComms import BluetoothComms as BC
+from BluetoothComms import BluetoothComms as BC
 import numpy
 
 
@@ -42,13 +42,15 @@ pid.output_limits = (0, 100)
 xCoord = 10
 yCoord = 10
 
-
+bc = None
 
 while(True):
     try:
         #Bluetooth Serial Comms
-        bc = BC()
-    except:
+        if bc == None:
+            bc = BC()
+    except Exception as e:
+        print(str(e))
         print("No device")
     
     try:
@@ -58,11 +60,15 @@ while(True):
         try:
             print("Trying")
             read = bc.read().split(" ")
-            xCoord = int(read[0])
-            yCoord = int(read[1])
-            print(xCoord)
-            print(yCoord)
-        except:
+            if read == None:
+                pass
+            else:
+                print(read)
+                xCoord = int(read[0])
+                yCoord = int(read[1])
+                print(xCoord)
+                print(yCoord)
+        except Exception as e:
             print("No (new) values from bluetooth")
 
         #DAQ
