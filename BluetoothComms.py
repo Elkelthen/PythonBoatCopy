@@ -6,9 +6,10 @@ class BluetoothComms():
             
         self.server_sock=BluetoothSocket( RFCOMM )
         self.server_sock.bind(("",PORT_ANY))
-        self.server_sock.setblocking(0)
+        self.server_sock.settimeout(1.0)
         self.server_sock.listen(1)
         self.client_sock, self.client_info = self.server_sock.accept()
+        self.client_sock.settimeout(1.0)
 
     def read(self):
         try:
