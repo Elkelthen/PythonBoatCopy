@@ -18,6 +18,13 @@ class BluetoothComms():
         except IOError:
             pass
         
+    def write(self, msg):
+        try:
+            print("sending")
+            self.client_sock.send(msg.encode())
+        except IOError:
+            pass
+        
     def cleanup(self):
         self.client_sock.close()
         self.server_sock.close()

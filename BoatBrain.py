@@ -62,6 +62,11 @@ while(True):
             read = bc.read().split(" ")
             if read == None:
                 pass
+            elif 'S' in read[0]:
+                ESC.setSpeed(int(read[0].replace('S','')))
+            elif 'GET' in read[0]:
+                sendStream = 'Heading:' + str(heading) + ' GoX:' + str(xCoord) + ' GoY:' + str(yCoord) + ' Lat:' + str(currentLat) + ' Long:' + str(currentLong)
+                bc.write(sendStream)
             else:
                 print(read)
                 xCoord = int(read[0])

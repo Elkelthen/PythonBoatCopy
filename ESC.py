@@ -16,7 +16,7 @@ class ESC():
         
     #Reset ESC. This should be followed by a series of beeps. This is calibration.
     def reset(self):
-        self.pi.set_servo_pulsewidth(self.pin, 1000)
+        self.pi.set_servo_pulsewidth(self.pin, 1150)
     
     #Change Speed of VSD
     def setSpeed(self, speed):
