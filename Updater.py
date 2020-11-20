@@ -1,4 +1,5 @@
 from git import Repo
+import time
 
 
 #A very simple class for updating the boat remotely.
@@ -9,6 +10,7 @@ from git import Repo
 try:
     repo = Repo('/home/pi/Desktop/PythonBoat')
     repo.remotes.origin.pull()
+    time.sleep(5)
 except Exception as e:
     print(str(e))
 
