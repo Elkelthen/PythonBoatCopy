@@ -1,1 +1,3 @@
 Use "PlastiDip" instead of Flex Seal, apparently better
+
+The blue RTV was good but smeared. Also using this to test the autopull script
