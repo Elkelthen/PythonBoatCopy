@@ -32,13 +32,15 @@ NEW_INFO_F = False
 
 
 class DataThread(threading.Thread):
-    global NEW_INFO_F, ACC_G, HEADING_G, CURRENT_LAT_G, CURRENT_LONG_G
-    
+
     def __init__(self):
+        threading.Thread.__init__(self)
         self.AccelCompass = AccelerometerCompass()
         self.GPS = GPS()
 
     def run(self):
+        global NEW_INFO_F, ACC_G, HEADING_G, CURRENT_LAT_G, CURRENT_LONG_G
+
         while True:
             acc = self.AccelCompass.getAccelAll()
             heading = self.AccelCompass.getCompassHeading()
@@ -55,31 +57,30 @@ class DataThread(threading.Thread):
                     print("Heading %.3f degrees\n" % (heading))
                 if currentLat != CURRENT_LAT_G:
                     CURRENT_LAT_G = currentLat
-                    print("Lat: %.3fg \t Long: %.3fg" % (GPS.getLat(), GPS.getLong()))
+                    print("Lat: %.3fg \t Long: %.3fg" % (self.GPS.getLat(), self.GPS.getLong()))
                 if currentLong != CURRENT_LONG_G:
                     CURRENT_LONG_G = currentLong
-                    print("Lat: %.3fg \t Long: %.3fg" % (GPS.getLat(), GPS.getLong()))
+                    print("Lat: %.3fg \t Long: %.3fg" % (self.GPS.getLat(), self.GPS.getLong()))
 
                 NEW_INFO_F = True
 
 class ControlThread(threading.Thread):
 
     def __init__(self):
-        # Set up a servo.
-        global NEW_INFO_F
+        threading.Thread.__init__(self)
 
         # Initialize ServoKit for PWM Hat
         self.kit = ServoKit(channels=16)
 
         # Initialize Servos
-        self.MotorControlX = Servo(2, kit)
+        self.MotorControlX = Servo(2, self.kit)
         self.MotorControlX.reset()
 
-        self.MotorControlY = Servo(3, kit)
+        self.MotorControlY = Servo(3, self.kit)
         self.MotorControlY.reset()
 
         # Initialize ESC
-        self.ESC = ESC(4, kit)
+        self.ESC = ESC(4, self.kit)
         self.ESC.reset()
 
         # PID CONTROLLER
@@ -87,6 +88,9 @@ class ControlThread(threading.Thread):
         self.pid.output_limits = (0, 100)
 
     def run(self):
+
+        global NEW_INFO_F
+
         while (True):
             if NEW_INFO_F:
                 AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
@@ -94,12 +98,15 @@ class ControlThread(threading.Thread):
                 NEW_INFO_F = False
 
 class CommsThread(threading.Thread):
-    global TARGET_LAT_G, TARGET_LONG_G
 
     def __init__(self):
+        threading.Thread.__init__(self)
         bc = None
 
     def run(self):
+
+        global TARGET_LAT_G, TARGET_LONG_G
+
         while True:
             try:
                 # Bluetooth Serial Comms
@@ -147,6 +154,4 @@ if __name__ == "__main__":
 
     while 1:
         time.sleep(1)
-        print(str(HEADING_G))
-
 
