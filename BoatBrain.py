@@ -137,9 +137,13 @@ class CommsThread(threading.Thread):
 
 if __name__ == "__main__":
 
-    DAQ = threading.Thread(target=DataThread)
-    CTL = threading.Thread(target=ControlThread)
-    COM = threading.Thread(target=CommsThread)
+    DAQ = DataThread()
+    CTL = ControlThread()
+    COM = CommsThread()
+
+    DAQ.start()
+    CTL.start()
+    COM.start()
 
     while 1:
         time.sleep(1)
