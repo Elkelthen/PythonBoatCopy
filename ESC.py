@@ -1,5 +1,4 @@
-import time
-import pigpio
+from adafruit_servokit import ServoKit
 
 #1000 to calibrate. This should be done on startup.
 #between 1150 and 2000(?) to control speed.
@@ -9,15 +8,14 @@ import pigpio
 class ESC():
     
     #initialize ESC Object
-    def __init__(self, pin, pi):
-        self.pi = pi
+    def __init__(self, pin, kit):
+        self.kit = kit
         self.pin = pin
-        pi.set_servo_pulsewidth(pin, 0)
         
     #Reset ESC. This should be followed by a series of beeps. This is calibration.
     def reset(self):
-        self.pi.set_servo_pulsewidth(self.pin, 1150)
+        self.kit.continuous_servo[self.pin].throttle = -1
     
     #Change Speed of VSD
     def setSpeed(self, speed):
-        self.pi.set_servo_pulsewidth(self.pin, speed)
+        self.kit.continuous_servo[self.pin].throttle = speed

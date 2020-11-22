@@ -16,8 +16,8 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     thrustVectorX = 30 * math.sin(theta)
     thrustVectorY = 30 * math.cos(theta)
     
-    thrustVectorX = (((thrustVectorX - 0) * (180 - 75)) / (360 - 0)) + 75
-    thrustVectorY = (((thrustVectorY - 0) * (180 - 75)) / (360 - 0)) + 75
+    thrustVectorX = (((thrustVectorX - 0) * (180 - 0)) / (360 - 0)) + 0
+    thrustVectorY = (((thrustVectorY - 0) * (180 - 0)) / (360 - 0)) + 0
     
     ServoX.move(thrustVectorX)
     ServoY.move(thrustVectorY)
@@ -29,18 +29,10 @@ def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
     
     print(coords1, coords2)
 
-    #distMeters = geopy.distance.distance(coords1, coords2).m
-    
-    #print(distMeters)
-
-    #output = abs(pid(distMeters))
     output = 0
-    
-    print(output)
 
     #NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-    output = (((output - 0) * (1000 - 2000)) / (100 - 0)) + 2000
-    #output = abs(output)
+    output = (((output - 0) * (1 - -1)) / (100 - 0)) + -1
     
     print(output)
     
