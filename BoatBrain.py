@@ -10,14 +10,14 @@ from BluetoothComms import BluetoothComms as BC
 import numpy
 import threading
 from adafruit_servokit import ServoKit
-
+import atexit
 
 ############################### GLOBAL VARIABLES ######################################
 
 ACC_G = 0
 HEADING_G = 0
-CURRENT_LAT_G = 0
-CURRENT_LONG_G = 0
+CURRENT_LAT_G = 10
+CURRENT_LONG_G = 10
 TARGET_LAT_G = 0
 TARGET_LONG_G = 0
 
@@ -80,21 +80,21 @@ class ControlThread(threading.Thread):
         self.MotorControlY.reset()
 
         # Initialize ESC
-        self.ESC = ESC(4, self.kit)
+        self.ESC = ESC(0, self.kit)
         self.ESC.reset()
-
-        # PID CONTROLLER
-        self.pid = PID(10, 0, 75, setpoint=0)
-        self.pid.output_limits = (0, 100)
 
     def run(self):
 
         global NEW_INFO_F
 
+        # PID CONTROLLER
+        self.pid = PID(1, 0.1, 0.05, setpoint=1)
+        self.pid.output_limits = (0, 100)
+
         while (True):
             if NEW_INFO_F:
                 AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
-                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, self.pid, CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
+                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, PID(1000, 0.1, 0.05, setpoint=0), CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
                 NEW_INFO_F = False
 
 class CommsThread(threading.Thread):
@@ -142,11 +142,28 @@ class CommsThread(threading.Thread):
             except:
                 pass
 
+    #Putting these cleanup methods here because I need to make sure
+    #The Control ESC will always stop spinning if the program exits.
+    #The others will probably come in handy at some point.
+
+def cleanUpData():
+    pass
+
+def cleanUpControl(ESC):
+    ESC.reset()
+
+def cleanUpComms():
+    pass
+
 if __name__ == "__main__":
 
     DAQ = DataThread()
     CTL = ControlThread()
     COM = CommsThread()
+
+    atexit.register(cleanUpData)
+    atexit.register(cleanUpComms)
+    atexit.register(cleanUpControl, CTL.ESC)
 
     DAQ.start()
     CTL.start()
