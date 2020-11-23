@@ -4,15 +4,25 @@ from simple_pid import PID
 
 def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longitude, ServoX, ServoY):
     goToHeading = 180 * (math.atan2(goToCoordsY - longitude, goToCoordsX - latitude)) / math.pi
-    
+
     theta = goToHeading - currentHeading
-    
+
+    theta = theta * (math.pi / 180)
+
     thrustVectorX = 30 * math.sin(theta)
     thrustVectorY = 30 * math.cos(theta)
-    
-    ServoX.move(abs(thrustVectorX))
-    ServoY.move(abs(thrustVectorY))
-    
+
+    if thrustVectorX < 0:
+        thrustVectorX += 360
+    if thrustVectorY < 0:
+        thrustVectorY += 360
+
+    thrustVectorX = (((thrustVectorX - 0) * (115 - 75)) / (360 - 0)) + 75
+    thrustVectorY = (((thrustVectorY - 0) * (115 - 75)) / (360 - 0)) + 75
+
+    ServoX.move(thrustVectorX)
+    ServoY.move(thrustVectorY)
+
 def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
 
     coords1 = (goToCoordsX, goToCoordsY)
@@ -27,7 +37,5 @@ def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
 
     #NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
     #output = (((output - 0) * (1 - -1)) / (100 - 0)) + -1
-
-    print(output)
 
     ESC.setSpeed(output)
