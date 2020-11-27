@@ -23,7 +23,7 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     ServoX.move(thrustVectorX)
     ServoY.move(thrustVectorY)
 
-def setThrustSpeed(goToCoordsY, goToCoordsX, pid, longitude, latitude, ESC):
+def setThrustSpeed(goToCoordsY, goToCoordsX, longitude, latitude, ESC):
 
     coords1 = (goToCoordsX, goToCoordsY)
     coords2 = (latitude, longitude)

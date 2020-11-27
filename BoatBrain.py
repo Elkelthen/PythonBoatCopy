@@ -73,14 +73,23 @@ class ControlThread(threading.Thread):
         self.kit = ServoKit(channels=16)
 
         # Initialize Servos
-        self.MotorControlX = Servo(2, self.kit)
+        self.MotorControlX = Servo(2, self.kit, False)
         self.MotorControlX.reset()
 
-        self.MotorControlY = Servo(3, self.kit)
+        self.MotorControlY = Servo(3, self.kit, False)
         self.MotorControlY.reset()
+
+        self.MotorControlXBack = Servo(4, self.kit, True)
+        self.MotorControlXBack.reset()
+
+        self.MotorControlYBack = Servo(5, self.kit, True)
+        self.MotorControlYBack.reset()
 
         # Initialize ESC
         self.ESC = ESC(0, self.kit)
+        self.ESC.reset()
+
+        self.ESCBack = ESC(1, self.kit)
         self.ESC.reset()
 
     def run(self):
@@ -93,8 +102,15 @@ class ControlThread(threading.Thread):
 
         while (True):
             if NEW_INFO_F:
+
+                #Front Assembly
                 AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
-                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, PID(1000, 0.1, 0.05, setpoint=0), CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
+                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
+
+                #Rear Assembly
+                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlXBack, self.MotorControlYBack)
+                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESCBack)
+
                 NEW_INFO_F = False
 
 class CommsThread(threading.Thread):
@@ -142,9 +158,9 @@ class CommsThread(threading.Thread):
             except:
                 pass
 
-    #Putting these cleanup methods here because I need to make sure
-    #The Control ESC will always stop spinning if the program exits.
-    #The others will probably come in handy at some point.
+#Putting these cleanup methods here because I need to make sure
+#The Control ESC will always stop spinning if the program exits.
+#The others will probably come in handy at some point.
 
 def cleanUpData():
     pass
@@ -169,6 +185,6 @@ if __name__ == "__main__":
     CTL.start()
     COM.start()
 
+    # Keep the program running. If this isn't here we instantly exit.
     while 1:
         time.sleep(1)
-

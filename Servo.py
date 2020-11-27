@@ -5,9 +5,10 @@ from adafruit_servokit import ServoKit
 class Servo():
     
     #Initialize Servo Object
-    def __init__(self, number, kit):
+    def __init__(self, number, kit, isBack):
         self.kit = kit
         self.number = number
+        self.isBack = isBack
         
     #Set servo to 0 degrees
     def reset(self):
@@ -15,4 +16,7 @@ class Servo():
         
     #Move to the degree location (0 - 180).
     def move(self, deg):
-        self.kit.servo[self.number].angle = deg
+        if self.isBack:
+            self.kit.servo[self.number].angle = 95
+        else:
+            self.kit.servo[self.number].angle = deg
