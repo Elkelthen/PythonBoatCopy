@@ -13,9 +13,9 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     thrustVectorY = 30 * math.cos(theta)
 
     if thrustVectorX < 0:
-        thrustVectorX += 360
+        thrustVectorX += 90
     if thrustVectorY < 0:
-        thrustVectorY += 360
+        thrustVectorY += 90
 
     thrustVectorX = (((thrustVectorX - 0) * (115 - 75)) / (360 - 0)) + 75
     thrustVectorY = (((thrustVectorY - 0) * (115 - 75)) / (360 - 0)) + 75
