@@ -1,13 +1,10 @@
-import RPi.GPIO as GPIO
 import time
-import pigpio
-import AutomaticMotorControl as AMC
-from Servo import Servo
-from ESC import ESC
-from DataAcquisition import AccelerometerCompass, GPS
+from CONTROL import AutomaticMotorControl as AMC
+from CONTROL.Servo import Servo
+from CONTROL.ESC import ESC
+from DAQ.DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
-from BluetoothComms import BluetoothComms as BC
-import numpy
+from COMMS.BluetoothComms import BluetoothComms as BC
 import threading
 from adafruit_servokit import ServoKit
 import atexit

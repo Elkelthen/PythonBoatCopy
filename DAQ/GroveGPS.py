@@ -53,7 +53,7 @@ class GPS:
         return [time,fix,sats,alt,lat,lat_ns,long,long_ew]
  
 g=GPS()
-f=open("gps_data.csv",'w')  #Open file to log the data
+f=open("gps_data.csv", 'w')  #Open file to log the data
 f.write("name,latitude,longitude\n")    #Write the header to the top of the file
 ind=0
 while True:
