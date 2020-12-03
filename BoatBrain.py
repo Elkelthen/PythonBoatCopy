@@ -11,6 +11,7 @@ import numpy
 import threading
 from adafruit_servokit import ServoKit
 import atexit
+import lsm9ds1_rjg
 
 ############################### GLOBAL VARIABLES ######################################
 
@@ -167,6 +168,7 @@ def cleanUpData():
 
 def cleanUpControl(ESC):
     ESC.reset()
+    #Need to add method to reset servos to neutral position
 
 def cleanUpComms():
     pass
