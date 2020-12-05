@@ -1,11 +1,10 @@
 import time
-import CONTROL.Servo
 from CONTROL import AutomaticMotorControl as AMC
-from CONTROL import Servo
-from CONTROL import ESC
+from CONTROL.Servo import Servo
+from CONTROL.ESC import ESC
 from DAQ.DataAcquisition import AccelerometerCompass, GPS
 from simple_pid import PID
-from COMMS import BluetoothComms as BC
+from COMMS.BluetoothComms import BluetoothComms as BC
 import threading
 from adafruit_servokit import ServoKit
 import atexit
