@@ -49,7 +49,8 @@ elif GPIO.input(Branch3):
 
 else:
     # If we have no input to the Pi, just pull master (no branch defaults to master).
-    Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat')
+    Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
+                    branch="master")
 
 # Sleep for a few seconds just to avoid any problems transitioning into the boatBrain program.
 # Remember, this script is called by start_boat.sh on startup.
