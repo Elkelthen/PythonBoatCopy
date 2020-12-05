@@ -35,11 +35,11 @@ os.chdir('/home/pi/Desktop/')
 # To push updated pin defs for new branches and update without having to actually
 # go into the pi itself. There may be a better way to do this.
 if GPIO.input(Branch1):
-    Repo.clone_from("https://github.com/JFreyWM/PythonBoat.git", '/home/pi/Desktop',
+    Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='JRG_Branch')
 
 elif GPIO.input(Branch2):
-    Repo.clone_from("https://github.com/JFreyWM/PythonBoat.git", '/home/pi/Desktop',
+    Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='LSM9DS_IMU')
 
 elif GPIO.input(Branch3):
@@ -49,7 +49,7 @@ elif GPIO.input(Branch3):
 
 else:
     # If we have no input to the Pi, just pull master (no branch defaults to master).
-    Repo.clone_from("https://github.com/JFreyWM/PythonBoat.git", '/home/pi/Desktop')
+    Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat')
 
 # Sleep for a few seconds just to avoid any problems transitioning into the boatBrain program.
 # Remember, this script is called by start_boat.sh on startup.
