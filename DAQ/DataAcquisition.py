@@ -38,6 +38,3 @@ class GPS():
     
     def getLong(self):
         return self.gps.long
-    
-#a = AccelerometerCompass()
-#print(print("Heading %.3f degrees\n" %(a.getCompassHeading())))

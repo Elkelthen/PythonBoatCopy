@@ -18,9 +18,9 @@ Branch1 = 21
 Branch2 = 20
 Branch3 = 19
 
-GPIO.setup(Branch1, GPIO.IN)
-GPIO.setup(Branch2, GPIO.IN)
-GPIO.setup(Branch3, GPIO.IN)
+GPIO.setup(Branch1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(Branch2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(Branch3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # Path to the local Repo on the pi. we start by removing the directory so that we can
 # avoid merge conflicts and other things like that. Just doing a clean install should be fine.
