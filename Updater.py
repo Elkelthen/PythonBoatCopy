@@ -18,9 +18,9 @@ Branch1 = 16
 Branch2 = 13
 Branch3 = 12
 
-GPIO.setup(Branch1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(Branch2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(Branch3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(Branch1, GPIO.IN)
+GPIO.setup(Branch2, GPIO.IN)
+GPIO.setup(Branch3, GPIO.IN)
 
 # Path to the local Repo on the pi. we start by removing the directory so that we can
 # avoid merge conflicts and other things like that. Just doing a clean install should be fine.
@@ -34,15 +34,15 @@ os.chdir('/home/pi/Desktop/')
 # The master branch pin definition (no pin at all), so we will always be able
 # To push updated pin defs for new branches and update without having to actually
 # go into the pi itself. There may be a better way to do this.
-if GPIO.input(Branch1):
+if GPIO.input(Branch1) == GPIO.HIGH:
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='JRG_Branch')
 
-elif GPIO.input(Branch2):
+elif GPIO.input(Branch2) == GPIO.HIGH:
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='LSM9DS_IMU')
 
-elif GPIO.input(Branch3):
+elif GPIO.input(Branch3) == GPIO.HIGH:
     # We don't have a third branch yet,
     # just leaving it here so we can expand later.
     pass
