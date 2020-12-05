@@ -16,6 +16,11 @@ sudo pigpiod
 #      set up a server in the future, but that probablt isn't worth it for now.
 /usr/bin/python3 Updater.py
 
+#The updater pulls another copy of pythonboat. When I do this manually, the cli stays on the
+#same directory, but doesn't have anything in that directory, since we had just deleted it.
+#I'm not really sure this part is necessary, but it can't hurt and may solve a problem. So here it is.
+cd /home/pi/Desktop/PythonBoat
+
 #Start Boatbrain.
 /usr/bin/python3 BoatBrain.py
 
