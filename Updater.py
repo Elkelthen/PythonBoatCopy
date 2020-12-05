@@ -27,6 +27,9 @@ GPIO.setup(Branch3, GPIO.IN)
 if os.path.exists('/home/pi/Desktop/PythonBoat'):
     shutil.rmtree('/home/pi/Desktop/PythonBoat')
 
+# Attempting to change directories so that clone_from() doesn't get angry at me.
+os.chdir('/home/pi/Desktop/')
+
 # These branches can be changed easily. Theoretically, we will never change
 # The master branch pin definition (no pin at all), so we will always be able
 # To push updated pin defs for new branches and update without having to actually
