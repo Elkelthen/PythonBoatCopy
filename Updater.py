@@ -14,9 +14,9 @@ import shutil
 GPIO.setmode(GPIO.BCM)
 
 # Pin definitions. Each pin will correspond to a different branch in the repo.
-Branch1 = 21
-Branch2 = 20
-Branch3 = 19
+Branch1 = 16
+Branch2 = 13
+Branch3 = 12
 
 GPIO.setup(Branch1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(Branch2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
