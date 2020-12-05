@@ -1,5 +1,5 @@
 from . import lsm303d
-from .GroveGPS import GPS as g
+from .grove_gps_data import GPS as g
 
 class AccelerometerCompass():
     
