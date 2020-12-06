@@ -34,20 +34,30 @@ os.chdir('/home/pi/Desktop/')
 # The master branch pin definition (no pin at all), so we will always be able
 # To push updated pin defs for new branches and update without having to actually
 # go into the pi itself. There may be a better way to do this.
+
+# Debugging
+print("B1: " + GPIO.input(Branch1))
+print("B2: " + GPIO.input(Branch2))
+print("B3: " + GPIO.input(Branch3))
+
 if GPIO.input(Branch1) == GPIO.HIGH:
+    print("Cloning JRG_Branch")
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='JRG_Branch')
 
 elif GPIO.input(Branch2) == GPIO.HIGH:
+    print("Cloning LSM9DS_IMU")
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='LSM9DS_IMU')
 
 elif GPIO.input(Branch3) == GPIO.HIGH:
+    print("Cloning Other")
     # We don't have a third branch yet,
     # just leaving it here so we can expand later.
     pass
 
 else:
+    print("Cloning Master")
     # If we have no input to the Pi, just pull master (no branch defaults to master).
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch="master")
