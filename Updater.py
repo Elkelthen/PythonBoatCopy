@@ -3,6 +3,17 @@ import time
 import RPi.GPIO as GPIO
 import os
 import shutil
+import socket
+
+# Check internet connection using the builtin socket library
+try:
+    socket.setdefaulttimeout(3)
+    socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect(("8.8.8.8", "53"))
+
+# If we have no internet or see some other error, just exit to avoid destroying the current program.
+except socket.error as ex:
+    print(ex)
+    exit()
 
 time.sleep(20)
 
