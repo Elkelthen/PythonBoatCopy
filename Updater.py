@@ -36,9 +36,9 @@ os.chdir('/home/pi/Desktop/')
 # go into the pi itself. There may be a better way to do this.
 
 # Debugging
-print("B1: " + GPIO.input(Branch1))
-print("B2: " + GPIO.input(Branch2))
-print("B3: " + GPIO.input(Branch3))
+print("B1: " + str(GPIO.input(Branch1)))
+print("B2: " + str(GPIO.input(Branch2)))
+print("B3: " + str(GPIO.input(Branch3)))
 
 if GPIO.input(Branch1) == GPIO.HIGH:
     print("Cloning JRG_Branch")
