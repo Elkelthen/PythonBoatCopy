@@ -101,16 +101,13 @@ class ControlThread(threading.Thread):
             if NEW_INFO_F:
 
                 #Front Assembly
-                # AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
-                # AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
-                self.MotorControlX.move(0)
-                time.sleep(2)
-                self.MotorControlX.move(90)
-                time.sleep(2)
+                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
+                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
+
 
                 #Rear Assembly
-                # AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlXBack, self.MotorControlYBack)
-                # AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESCBack)
+                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlXBack, self.MotorControlYBack)
+                AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESCBack)
 
                 NEW_INFO_F = False
 
