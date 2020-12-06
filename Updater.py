@@ -5,6 +5,9 @@ import os
 import shutil
 import socket
 
+# Sleep for a while to ensure the service has internet connection.
+time.sleep(12)
+
 # Check internet connection using the builtin socket library
 try:
     socket.setdefaulttimeout(3)
@@ -14,8 +17,6 @@ try:
 except socket.error as ex:
     print(ex)
     exit()
-
-time.sleep(20)
 
 # A very simple class for updating the boat remotely.
 # The idea is that we should be able to run the pi in
