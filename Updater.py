@@ -4,6 +4,8 @@ import RPi.GPIO as GPIO
 import os
 import shutil
 
+time.sleep(5)
+
 # A very simple class for updating the boat remotely.
 # The idea is that we should be able to run the pi in
 # headless mode, plugged into ethernet, and have it update
