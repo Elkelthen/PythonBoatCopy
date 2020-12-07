@@ -1,0 +1,16 @@
+The following are required packages for the codebase, and their related linux commands for install.
+
+sudo pip3 install adafruit-circuitpython-servokit
+sudo pip install adafruit-servokit
+sudo pip3 install lsm9ds1-jrg
+sudo pip install geopy
+sudo pip3 install simple-pid
+sudo pip3 install pybluez
+
+
+For current GPS on UART /dev/ttyAMA0 (/dev/serial0)
+sudo apt-get install gpsd gpsd-clients
+sudo systemctl disable gpsd.socket
+sudo gpsd /dev/serial0 -F /var/run/gpsd.sock
+Then to display GPS data in command line:
+sudo gpsmon /dev/serial0

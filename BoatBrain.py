@@ -1,17 +1,15 @@
-import RPi.GPIO as GPIO
-import time
-import pigpio
-import AutomaticMotorControl as AMC
-from Servo import Servo
-from ESC import ESC
-from DataAcquisition import AccelerometerCompass, GPS
-from simple_pid import PID
-from BluetoothComms import BluetoothComms as BC
-import numpy
-import threading
-from adafruit_servokit import ServoKit
 import atexit
-import lsm9ds1_rjg
+import threading
+import time
+
+from adafruit_servokit import ServoKit
+from simple_pid import PID
+
+import AutomaticMotorControl as AMC
+from BluetoothComms import BluetoothComms as BC
+from DataAcquisition import AccelerometerCompass, GPS
+from ESC import ESC
+from Servo import Servo
 
 ############################### GLOBAL VARIABLES ######################################
 
@@ -22,12 +20,12 @@ CURRENT_LONG_G = 10
 TARGET_LAT_G = 0
 TARGET_LONG_G = 0
 
-
 ############################## END GLOBAL VARIABLES ###################################
 
 ################################### FLAGS #############################################
 
 NEW_INFO_F = False
+
 
 ################################ END FLAGS ############################################
 
@@ -64,6 +62,7 @@ class DataThread(threading.Thread):
                     print("Lat: %.3fg \t Long: %.3fg" % (self.GPS.getLat(), self.GPS.getLong()))
 
                 NEW_INFO_F = True
+
 
 class ControlThread(threading.Thread):
 
@@ -103,16 +102,18 @@ class ControlThread(threading.Thread):
 
         while (True):
             if NEW_INFO_F:
-
-                #Front Assembly
-                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlX, self.MotorControlY)
+                # Front Assembly
+                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G,
+                                       self.MotorControlX, self.MotorControlY)
                 AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESC)
 
-                #Rear Assembly
-                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G, self.MotorControlXBack, self.MotorControlYBack)
+                # Rear Assembly
+                AMC.setThrustDirection(HEADING_G, TARGET_LAT_G, TARGET_LONG_G, CURRENT_LAT_G, CURRENT_LONG_G,
+                                       self.MotorControlXBack, self.MotorControlYBack)
                 AMC.setThrustSpeed(TARGET_LAT_G, TARGET_LONG_G, CURRENT_LONG_G, CURRENT_LAT_G, self.ESCBack)
 
                 NEW_INFO_F = False
+
 
 class CommsThread(threading.Thread):
 
@@ -159,19 +160,23 @@ class CommsThread(threading.Thread):
             except:
                 pass
 
-#Putting these cleanup methods here because I need to make sure
-#The Control ESC will always stop spinning if the program exits.
-#The others will probably come in handy at some point.
 
-def cleanUpData():
+# Putting these cleanup methods here because I need to make sure
+# The Control ESC will always stop spinning if the program exits.
+# The others will probably come in handy at some point.
+
+def cleanup_data():
     pass
+
 
 def cleanUpControl(ESC):
     ESC.reset()
-    #Need to add method to reset servos to neutral position
+    # Need to add method to reset servos to neutral position
+
 
 def cleanUpComms():
     pass
+
 
 if __name__ == "__main__":
 
@@ -179,7 +184,7 @@ if __name__ == "__main__":
     CTL = ControlThread()
     COM = CommsThread()
 
-    atexit.register(cleanUpData)
+    atexit.register(cleanup_data)
     atexit.register(cleanUpComms)
     atexit.register(cleanUpControl, CTL.ESC)
 
