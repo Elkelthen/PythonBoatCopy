@@ -2,7 +2,8 @@
 #
 # GrovePi Example for using the Grove GPS Module http://www.seeedstudio.com/depot/Grove-GPS-p-959.html?cPath=25_130
 #
-# The GrovePi connects the Raspberry Pi and Grove sensors.  You can learn more about GrovePi here:  http://www.dexterindustries.com/GrovePi
+# The GrovePi connects the Raspberry Pi and Grove sensors.  You can learn more about GrovePi here:
+# http://www.dexterindustries.com/GrovePi
 #
 # Have a question about this example?  Ask on the forums here:  http://forum.dexterindustries.com/c/grovepi
 #

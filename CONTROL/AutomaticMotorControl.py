@@ -1,9 +1,24 @@
+""""AutomaticMotorControl.py
+
+This module contains no classes, only helper methods to help control
+the speed and direction of the boats.
+
+Accessed by BoatBrain.py
+
+"""
+
 import math
 import geopy.distance
-from simple_pid import PID
 
-def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longitude, ServoX, ServoY):
-    goToHeading = 180 * (math.atan2(goToCoordsY - longitude, goToCoordsX - latitude)) / math.pi
+
+def setThrustDirection(currentHeading, goToCoords, currentCoords, servoX, servoY):
+    """setThrustDirection()
+
+    Takes input from BoatBrain.py to calculate the necessary position of servos for VSD control.
+
+    """
+    goToHeading = 180 * (math.atan2(goToCoords[1] - currentCoords[1],
+                                    goToCoords[0] - currentCoords[0])) / math.pi
 
     theta = goToHeading - currentHeading
 
@@ -20,22 +35,25 @@ def setThrustDirection(currentHeading, goToCoordsY, goToCoordsX, latitude, longi
     thrustVectorX = (((thrustVectorX - 0) * (115 - 75)) / (360 - 0)) + 75
     thrustVectorY = (((thrustVectorY - 0) * (115 - 75)) / (360 - 0)) + 75
 
-    ServoX.move(thrustVectorX)
-    ServoY.move(thrustVectorY)
+    servoX.move(thrustVectorX)
+    servoY.move(thrustVectorY)
 
-def setThrustSpeed(goToCoordsY, goToCoordsX, longitude, latitude, ESC):
 
-    coords1 = (goToCoordsX, goToCoordsY)
-    coords2 = (latitude, longitude)
+def setThrustSpeed(goToCoords, currentCoords, esc):
+    """setThrustSpeed()
 
-    distmeters = geopy.distance.distance(coords1, coords2).m
+    Takes input from BoatBrain.py to send a PWM signal to the ESC, determining speed.
+
+    """
+
+    distmeters = geopy.distance.distance(goToCoords, currentCoords).m
 
     if distmeters <= 10:
         output = 0
     else:
         output = 1
 
-    #NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-    #output = (((output - 0) * (1 - -1)) / (100 - 0)) + -1
+    # NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+    # output = (((output - 0) * (1 - -1)) / (100 - 0)) + -1
 
-    ESC.setSpeed(output)
+    esc.setSpeed(output)

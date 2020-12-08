@@ -1,40 +1,85 @@
+"""
+General sensor data getters
+"""
+
 from . import lsm303d
 from .grove_gps_data import GPS as g
 
+# Statics because Pylint says this is better
+
+def getAccelX(accelList):
+    """
+    Get specific X component from a list (requires getAccelAll() first).
+    :param accelList:
+    :return:
+    """
+    return accelList[0]
+
+
+def getAccelY(accelList):
+    """
+    Get specific Y component from a list (requires getAccelAll() first).
+    :param accelList:
+    :return:
+    """
+    return accelList[1]
+
+
+def getAccelZ(accelList):
+    """
+    Get specific Z component from a list (requires getAccelAll() first).
+    :param accelList:
+    :return:
+    """
+    return accelList[2]
+
+
 class AccelerometerCompass():
-    
+    """
+    Getters for the lsm303d Acc/Compass breakout.
+    """
+
     def __init__(self):
-        self.acc_mag = lsm303d.lsm303d()
-    
-    #Get all Accelerometer Values as a list.
+        self.accMag = lsm303d.lsm303d()
+
     def getAccelAll(self):
-        return self.acc_mag.getRealAccel()
-    
-    #Get specific X Y or Z components from a list (requires getAccelAll() first).
-    def getAccelX(self, accelList):
-        return accelList[0]
-    
-    def getAccelY(self, accelList):
-        return accelList[1]
-    
-    def getAccelZ(self, accelList):
-        return accelList[2]
-    
-    #get heading
+        """
+        Get all Accelerometer Values as a list.
+        :return:
+        """
+        return self.accMag.getRealAccel()
+
     def getCompassHeading(self):
-        heading = self.acc_mag.getHeading()
+        """
+        get heading
+        :return:
+        """
+        heading = self.accMag.getHeading()
         return heading
-    
+
+
 class GPS():
-    
+    """
+    Initialize GPS Class
+    """
+
     def __init__(self):
         self.gps = g()
-    
+
     def read(self):
+        """
+        :return: lat and long values from GPS chip
+        """
         self.gps.getLatLong()
-    
+
     def getLat(self):
+        """
+        :return: gps latitude
+        """
         return self.gps.lat
-    
+
     def getLong(self):
+        """
+        :return: gps longitude
+        """
         return self.gps.long
