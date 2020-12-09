@@ -14,7 +14,7 @@ sudo pigpiod
 #NOTE: this won't actually run the latest copy of the updater, which is slightly annoying.
 #      it only pulls from git, which may also include an (updated) updater. Hmph. We could
 #      set up a server in the future, but that probablt isn't worth it for now.
-/usr/bin/python3 Updater.py
+/usr/bin/python3 updater.py
 
 #The updater pulls another copy of pythonboat. When I do this manually, the cli stays on the
 #same directory, but doesn't have anything in that directory, since we had just deleted it.
