@@ -5,7 +5,7 @@ Lower level control functions for the speed control of the boat.
 """
 
 
-#Class to control VSDs through the use of ESCs.
+# Class to control VSDs through the use of ESCs.
 class ESC():
     """ESC()
 
@@ -13,11 +13,11 @@ class ESC():
     are initialized, one for the front ESC, one for the back.
 
     """
-    #initialize ESC Object
+
+    # initialize ESC Object
     def __init__(self, pin, kit):
         self.kit = kit
         self.pin = pin
-
 
     def reset(self):
         """
@@ -26,8 +26,7 @@ class ESC():
         """
         self.kit.continuous_servo[self.pin].throttle = -1
 
-
-    def setSpeed(self, speed):
+    def set_speed(self, speed):
         """
         Change Speed of VSD
         :param speed:

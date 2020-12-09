@@ -22,5 +22,5 @@ sudo pigpiod
 cd /home/pi/Desktop/PythonBoat
 
 #Start Boatbrain.
-/usr/bin/python3 BoatBrain.py
+/usr/bin/python3 boat_brain.py
 

@@ -1,4 +1,4 @@
-"""BoatBrain.py
+"""boat_brain.py
 
 This is the main file for the project. Running this should start the boat.
 
@@ -8,11 +8,11 @@ import time
 import threading
 import atexit
 from adafruit_servokit import ServoKit
-from CONTROL import AutomaticMotorControl as AMC
-from CONTROL.Servo import Servo
-from CONTROL.ESC import ESC
-from DAQ.DataAcquisition import AccelerometerCompass, GPS
-from COMMS.BluetoothComms import BluetoothComms as BC
+from control import automatic_motor_control as AMC
+from control.servo import Servo
+from control.esc import ESC
+from daq.data_acquisition import AccelerometerCompass, GPS
+from comms.bluetooth_comms import BluetoothComms as BC
 
 
 
@@ -42,18 +42,18 @@ class DataThread(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.accelCompass = AccelerometerCompass()
+        self.accel_compass = AccelerometerCompass()
         self.gps = GPS()
 
     def run(self):
         global NEW_INFO_F, ACC_G, HEADING_G, CURRENT_LAT_LONG_G
 
         while True:
-            acc = self.accelCompass.getAccelAll()
-            heading = self.accelCompass.getCompassHeading()
+            acc = self.accel_compass.get_accel_all()
+            heading = self.accel_compass.get_compass_heading()
             self.gps.read()
-            currentLat = self.gps.getLat()
-            currentLong = self.gps.getLong()
+            current_lat = self.gps.get_lat()
+            current_long = self.gps.get_long()
 
             if not NEW_INFO_F:
                 if acc != ACC_G:
@@ -62,12 +62,12 @@ class DataThread(threading.Thread):
                 if heading != HEADING_G:
                     HEADING_G = heading
                     print("Heading %.3f degrees\n" % (heading))
-                if currentLat != CURRENT_LAT_LONG_G[0]:
-                    CURRENT_LAT_LONG_G[1] = currentLat
-                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.getLat(), self.gps.getLong()))
-                if currentLong != CURRENT_LAT_LONG_G[1]:
-                    CURRENT_LAT_LONG_G[0] = currentLong
-                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.getLat(), self.gps.getLong()))
+                if current_lat != CURRENT_LAT_LONG_G[0]:
+                    CURRENT_LAT_LONG_G[1] = current_lat
+                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
+                if current_long != CURRENT_LAT_LONG_G[1]:
+                    CURRENT_LAT_LONG_G[0] = current_long
+                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
 
                 NEW_INFO_F = True
 
@@ -83,24 +83,24 @@ class ControlThread(threading.Thread):
         self.kit = ServoKit(channels=16)
 
         # Initialize Servos
-        self.motorControlX = Servo(2, self.kit, False)
-        self.motorControlX.reset()
+        self.motor_control_x = Servo(2, self.kit, False)
+        self.motor_control_x.reset()
 
-        self.motorControlY = Servo(3, self.kit, False)
-        self.motorControlY.reset()
+        self.motor_control_y = Servo(3, self.kit, False)
+        self.motor_control_y.reset()
 
-        self.motorControlXBack = Servo(4, self.kit, True)
-        self.motorControlXBack.reset()
+        self.motor_control_x_back = Servo(4, self.kit, True)
+        self.motor_control_x_back.reset()
 
-        self.motorControlYBack = Servo(5, self.kit, True)
-        self.motorControlYBack.reset()
+        self.motor_control_y_back = Servo(5, self.kit, True)
+        self.motor_control_y_back.reset()
 
         # Initialize ESC
         self.esc = ESC(0, self.kit)
         self.esc.reset()
 
-        self.escBack = ESC(1, self.kit)
-        self.esc.reset()
+        self.esc_back = ESC(1, self.kit)
+        self.esc_back.reset()
 
     def run(self):
 
@@ -109,16 +109,16 @@ class ControlThread(threading.Thread):
         while True:
             if NEW_INFO_F:
 
-                #Front Assembly
-                AMC.setThrustDirection(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
-                                       self.motorControlX, self.motorControlY)
-                AMC.setThrustSpeed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc)
+                # Front Assembly
+                AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
+                                         self.motor_control_x, self.motor_control_y)
+                AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc)
 
 
-                #Rear Assembly
-                AMC.setThrustDirection(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
-                                       self.motorControlXBack, self.motorControlYBack)
-                AMC.setThrustSpeed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.escBack)
+                # Rear Assembly
+                AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
+                                         self.motor_control_x_back, self.motor_control_y_back)
+                AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc_back)
 
                 NEW_INFO_F = False
 
@@ -129,7 +129,7 @@ class CommsThread(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.bluetoothComm = None
+        self.bluetooth_comm = None
 
     def run(self):
 
@@ -138,8 +138,8 @@ class CommsThread(threading.Thread):
         while True:
             try:
                 # Bluetooth Serial Comms
-                if self.bluetoothComm is None:
-                    self.bluetoothComm = BC()
+                if self.bluetooth_comm is None:
+                    self.bluetooth_comm = BC()
             except Exception as error:
                 print(str(error))
                 print("No device")
@@ -150,20 +150,20 @@ class CommsThread(threading.Thread):
                 # Read input from Bluetooth Comms
                 try:
                     print("Trying")
-                    read = self.bluetoothComm.read().split(" ")
+                    read = self.bluetooth_comm.read().split(" ")
                     if read is None:
                         pass
                     elif 'S' in read[0]:
                         # ESC.setSpeed(int(read[0].replace('S', '')))
-                        # TODO: MANUAL SPEED CONTROL ACROSS THREADS
+                        # TODO: MANUAL SPEED control ACROSS THREADS
                         pass
                     elif 'GET' in read[0]:
-                        sendStream = 'Heading:' + str(HEADING_G) +\
+                        send_stream = 'Heading:' + str(HEADING_G) +\
                                      ' GoX:' + str(TARGET_LAT_LONG_G[1]) +\
                                      ' GoY:' + str(TARGET_LAT_LONG_G[0]) +\
                                      ' Lat:' + str(CURRENT_LAT_LONG_G[0]) +\
                                      ' Long:' + str(CURRENT_LAT_LONG_G[1])
-                        self.bluetoothComm.write(sendStream)
+                        self.bluetooth_comm.write(send_stream)
                     else:
                         print(read)
                         TARGET_LAT_LONG_G[1] = int(read[0])
@@ -179,14 +179,14 @@ class CommsThread(threading.Thread):
 #The Control ESC will always stop spinning if the program exits.
 #The others will probably come in handy at some point.
 
-def cleanUpData():
+def clean_up_data():
     """
     Clean up data process at end of program.
     :return:
     """
 
 
-def cleanUpControl(esc):
+def clean_up_control(esc):
     """
     Clean up Control Process at end of program
     :param esc:
@@ -194,7 +194,7 @@ def cleanUpControl(esc):
     """
     esc.reset()
 
-def cleanUpComms():
+def clean_up_comms():
     """
     Clean up communications at end of program.
     :return:
@@ -207,9 +207,9 @@ if __name__ == "__main__":
     CTL = ControlThread()
     COM = CommsThread()
 
-    atexit.register(cleanUpData)
-    atexit.register(cleanUpComms)
-    atexit.register(cleanUpControl, CTL.esc)
+    atexit.register(clean_up_data)
+    atexit.register(clean_up_comms)
+    atexit.register(clean_up_control, CTL.esc)
 
     DAQ.start()
     CTL.start()

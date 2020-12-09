@@ -1,4 +1,4 @@
-"""BluetoothComms.py
+"""bluetooth_comms.py
 
 Lower level control of the bluetooth communications between phone and raspi.
 
@@ -14,12 +14,12 @@ class BluetoothComms():
 
     def __init__(self):
 
-        self.serverSock=BluetoothSocket(RFCOMM)
-        self.serverSock.bind(("", PORT_ANY))
-        self.serverSock.settimeout(1.0)
-        self.serverSock.listen(1)
-        self.clientSock, self.clientInfo = self.serverSock.accept()
-        self.clientSock.settimeout(1.0)
+        self.server_sock=BluetoothSocket(RFCOMM)
+        self.server_sock.bind(("", PORT_ANY))
+        self.server_sock.settimeout(1.0)
+        self.server_sock.listen(1)
+        self.client_sock, self.client_info = self.server_sock.accept()
+        self.client_sock.settimeout(1.0)
 
     def read(self):
         """
@@ -27,7 +27,7 @@ class BluetoothComms():
         :return:
         """
         try:
-            data = self.clientSock.recv(1024).decode('utf-8')
+            data = self.client_sock.recv(1024).decode('utf-8')
             return data
         except IOError:
             pass
@@ -40,6 +40,6 @@ class BluetoothComms():
         """
         try:
             print("sending")
-            self.clientSock.send(msg.encode())
+            self.client_sock.send(msg.encode())
         except IOError:
             pass

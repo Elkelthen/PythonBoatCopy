@@ -1,4 +1,4 @@
-"""Servo.py
+"""servo.py
 Basic Servo Class to steer the boat
 """
 
@@ -11,7 +11,7 @@ class Servo():
     def __init__(self, number, kit, isBack):
         self.kit = kit
         self.number = number
-        self.isBack = isBack
+        self.is_back = isBack
 
     def reset(self):
         """
@@ -26,7 +26,7 @@ class Servo():
         :param deg:
         :return:
         """
-        if self.isBack:
+        if self.is_back:
             self.kit.servo[self.number].angle = 95
         else:
             self.kit.servo[self.number].angle = deg

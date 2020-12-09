@@ -1,9 +1,12 @@
-from git import Repo
+"""
+Module for updating headlessly on the RPI
+"""
 import time
-import RPi.GPIO as GPIO
 import os
 import shutil
 import socket
+import RPi.GPIO as GPIO
+from git import Repo
 
 # Sleep for a while to ensure the service has internet connection.
 time.sleep(12)
@@ -28,13 +31,13 @@ except socket.error as ex:
 GPIO.setmode(GPIO.BCM)
 
 # Pin definitions. Each pin will correspond to a different branch in the repo.
-Branch1 = 16
-Branch2 = 13
-Branch3 = 12
+BRANCH1 = 16
+BRANCH2 = 13
+BRANCH3 = 12
 
-GPIO.setup(Branch1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(Branch2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(Branch3, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BRANCH1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BRANCH2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(BRANCH3, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 # Path to the local Repo on the pi. we start by removing the directory so that we can
 # avoid merge conflicts and other things like that. Just doing a clean install should be fine.
@@ -50,25 +53,24 @@ os.chdir('/home/pi/Desktop/')
 # go into the pi itself. There may be a better way to do this.
 
 # Debugging
-print("B1: " + str(GPIO.input(Branch1)))
-print("B2: " + str(GPIO.input(Branch2)))
-print("B3: " + str(GPIO.input(Branch3)))
+print("B1: " + str(GPIO.input(BRANCH1)))
+print("B2: " + str(GPIO.input(BRANCH2)))
+print("B3: " + str(GPIO.input(BRANCH3)))
 
-if GPIO.input(Branch1) == GPIO.HIGH:
+if GPIO.input(BRANCH1) == GPIO.HIGH:
     print("Cloning JRG_Branch")
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='JRG_Branch')
 
-elif GPIO.input(Branch2) == GPIO.HIGH:
+elif GPIO.input(BRANCH2) == GPIO.HIGH:
     print("Cloning LSM9DS_IMU")
     Repo.clone_from("git@github.com:JFreyWM/PythonBoat.git", '/home/pi/Desktop/PythonBoat',
                     branch='LSM9DS_IMU')
 
-elif GPIO.input(Branch3) == GPIO.HIGH:
+elif GPIO.input(BRANCH3) == GPIO.HIGH:
     print("Cloning Other")
     # We don't have a third branch yet,
     # just leaving it here so we can expand later.
-    pass
 
 else:
     print("Cloning Master")

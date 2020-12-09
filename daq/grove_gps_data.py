@@ -1,0 +1,183 @@
+#!/usr/bin/env python
+#
+# GrovePi Example for using the Grove GPS Module
+# http://www.seeedstudio.com/depot/Grove-GPS-p-959.html?cPath=25_130
+#
+# The GrovePi connects the Raspberry Pi and Grove sensors.  You can learn more about GrovePi here:
+# http://www.dexterindustries.com/GrovePi
+#
+# Have a question about this example?  Ask on the forums here:
+# http://forum.dexterindustries.com/c/grovepi
+#
+'''
+## License
+
+The MIT License (MIT)
+
+GrovePi for the Raspberry Pi: an open source platform
+ for connecting Grove Sensors to the Raspberry Pi.
+Copyright (C) 2017  Dexter Industries
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+'''
+# History
+# ------------------------------------------------
+# Author     Date           Comments
+# Karan      21 Aug 14      Initial Authoring
+# Karan      10 June 15     Updated the code to reflect the decimal GPS coordinates
+# (contributed by rschmidt on the DI forums:
+# http://www.dexterindustries.com/forum/?topic=gps-example-questions/#post-5668)
+# Karan      18 Mar 16      Updated code to handle conditions where no fix from satellite
+#
+#
+#####################################################
+#
+# GPS SENSOR GOES INTO RPISER PORT
+#
+#####################################################
+#
+import time
+import serial
+
+ENABLE_DEBUG = 1
+ENABLE_SAVE_TO_FILE = 0
+
+# if ir_receiver_check.check_ir():
+#   print("Disable IR receiver before continuing")
+#   exit()
+
+ser = serial.Serial('/dev/tty0', 9600, timeout=0)  # Open the serial port at 9600 baud
+ser.flush()
+
+
+def cleanstr(in_str):
+    """
+    :param in_str: string with spaces between numbers
+    :return: cleaned string
+    """
+    out_str = "".join([c for c in in_str if c in "0123456789.-"])
+    if len(out_str) == 0:
+        out_str = "-1"
+    return out_str
+
+
+def safefloat(in_str):
+    """
+    :param in_str: a number
+    :return: either a float of instr or -1.0 as an error
+    """
+    try:
+        out_str = float(in_str)
+    except ValueError:
+        out_str = -1.0
+    return out_str
+
+
+def read():
+    """
+    :return: # Read data from the GPS
+    """
+
+    GPS.inp = ser.readline()
+    # if GPS.inp[:6] =='$GPGGA': # GGA data , packet 1, has all the data we need
+    # break
+    time.sleep(0.1)  # without the cmd program will crash
+    try:
+        # Sometimes multiple GPS data packets come into the stream.
+        # Take the data only after the last '$GPGGA' is seen
+        ind = GPS.inp.index('$GPGGA', 5, len(GPS.inp))
+        GPS.inp = GPS.inp[ind:]
+    except ValueError:
+        print("")
+    GPS.GGA = GPS.inp.split(",")  # Split the stream into individual parts
+    return [GPS.GGA]
+
+
+def vals():
+    """
+    :return: Split the data into individual elements
+    """
+    if GPS.GGA[2] == '':  # latitude. Technically a float
+        lat = -1.0
+    else:
+        lat = safefloat(cleanstr(GPS.GGA[2]))
+
+    if GPS.GGA[3] == '':  # this should be either N or S
+        lat_ns = ""
+    else:
+        lat_ns = str(GPS.GGA[3])
+
+    if GPS.GGA[4] == '':  # longitude. Technically a float
+        long = -1.0
+    else:
+        long = safefloat(cleanstr(GPS.GGA[4]))
+
+    if GPS.GGA[5] == '':  # this should be either W or E
+        long_ew = ""
+    else:
+        long_ew = str(GPS.GGA[5])
+
+    return [lat, lat_ns, long, long_ew]
+
+
+def decimal_degrees(raw_degrees):
+    """
+    :param raw_degrees:
+    :return decimal degrees:
+    """
+    try:
+        degrees = float(raw_degrees) // 100
+        degrees_too = float(raw_degrees) % 100 / 60
+        return degrees + degrees_too
+    except:
+        return raw_degrees
+
+
+class GPS:
+    """
+    #The GPS module used is a Grove GPS module http://www.seeedstudio.com/depot/Grove-GPS-p-959.html
+    """
+    inp = []
+    # Refer to SIM28 NMEA spec file http://www.seeedstudio.com/wiki/images/a/a0/SIM28_DATA_File.zip
+    GGA = []
+
+    def __init__(self):
+        self.lat = -1
+        self.long = -1
+
+    def get_lat_long(self):
+        """
+        :return latitude and longitude in a way boatbrain can understand:
+        """
+        try:
+            read()  # Read from GPS
+            [lat, lat_ns, longitude, long_ew] = vals()  # Get the individial values
+
+            # Convert to decimal degrees
+            if lat != -1.0:
+                self.lat = decimal_degrees(safefloat(lat))
+                if lat_ns == "S":
+                    self.lat = -self.lat
+
+            if longitude != -1.0:
+                self.long = decimal_degrees(safefloat(longitude))
+                if long_ew == "W":
+                    self.long = -self.long
+        except:
+            pass
