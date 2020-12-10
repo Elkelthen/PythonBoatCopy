@@ -7,6 +7,7 @@ This is the main file for the project. Running this should start the boat.
 import time
 import threading
 import atexit
+import data_globals
 from adafruit_servokit import ServoKit
 from control import automatic_motor_control as AMC
 from control.servo import Servo
@@ -14,24 +15,6 @@ from control.esc import ESC
 from daq.data_acquisition import AccelerometerCompass, GPS
 from comms.bluetooth_comms import BluetoothComms as BC
 from comms.ble_peripheral import BLEPeripheral
-
-############################### GLOBAL VARIABLES ######################################
-
-ACC_G = 0
-HEADING_G = 0
-
-# (Long, Lat) (X, Y)
-CURRENT_LAT_LONG_G = [10, 10]
-TARGET_LAT_LONG_G = [0, 0]
-
-############################## END GLOBAL VARIABLES ###################################
-
-################################### FLAGS #############################################
-
-NEW_INFO_F = False
-
-
-################################ END FLAGS ############################################
 
 
 class DataThread(threading.Thread):
@@ -45,7 +28,6 @@ class DataThread(threading.Thread):
         self.gps = GPS()
 
     def run(self):
-        global NEW_INFO_F, ACC_G, HEADING_G, CURRENT_LAT_LONG_G
 
         while True:
             acc = self.accel_compass.get_accel_all()
@@ -54,18 +36,18 @@ class DataThread(threading.Thread):
             current_lat = self.gps.get_lat()
             current_long = self.gps.get_long()
 
-            if not NEW_INFO_F:
+            if not data_globals.NEW_INFO_F:
                 if acc != ACC_G:
                     ACC_G = acc
                     print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" % (acc[0], acc[1], acc[2]))
                 if heading != HEADING_G:
                     HEADING_G = heading
                     print("Heading %.3f degrees\n" % (heading))
-                if current_lat != CURRENT_LAT_LONG_G[0]:
-                    CURRENT_LAT_LONG_G[1] = current_lat
+                if current_lat != data_globals.CURRENT_LAT_LONG_G[0]:
+                    data_globals.CURRENT_LAT_LONG_G[1] = current_lat
                     print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
-                if current_long != CURRENT_LAT_LONG_G[1]:
-                    CURRENT_LAT_LONG_G[0] = current_long
+                if current_long != data_globals.CURRENT_LAT_LONG_G[1]:
+                    data_globals.CURRENT_LAT_LONG_G[0] = current_long
                     print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
 
                 NEW_INFO_F = True
@@ -104,19 +86,17 @@ class ControlThread(threading.Thread):
 
     def run(self):
 
-        global NEW_INFO_F, TARGET_LAT_LONG_G
-
         while True:
-            if NEW_INFO_F:
+            if data_globals.NEW_INFO_F:
                 # Front Assembly
-                AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
+                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G,
                                          self.motor_control_x, self.motor_control_y)
-                AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc)
+                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G, self.esc)
 
                 # Rear Assembly
-                AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
+                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G,
                                          self.motor_control_x_back, self.motor_control_y_back)
-                AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc_back)
+                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G, self.esc_back)
 
                 NEW_INFO_F = False
 
@@ -129,13 +109,9 @@ class CommsThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.bluetooth_comm = None
+        self.ble_periph = BLEPeripheral()
 
     def run(self):
-
-        global TARGET_LAT_LONG_G
-
-        # Adding this to remember where it goes later.
-        ble_periph = BLEPeripheral()
 
         while True:
             try:
@@ -160,18 +136,18 @@ class CommsThread(threading.Thread):
                         # TODO: MANUAL SPEED CONTROL ACROSS THREADS
                         pass
                     elif 'GET' in read[0]:
-                        send_stream = 'Heading:' + str(HEADING_G) + \
-                                      ' GoX:' + str(TARGET_LAT_LONG_G[1]) + \
-                                      ' GoY:' + str(TARGET_LAT_LONG_G[0]) + \
-                                      ' Lat:' + str(CURRENT_LAT_LONG_G[0]) + \
-                                      ' Long:' + str(CURRENT_LAT_LONG_G[1])
+                        send_stream = 'Heading:' + str(data_globals.HEADING_G) + \
+                                      ' GoX:' + str(data_globals.TARGET_LAT_LONG_G[1]) + \
+                                      ' GoY:' + str(data_globals.TARGET_LAT_LONG_G[0]) + \
+                                      ' Lat:' + str(data_globals.CURRENT_LAT_LONG_G[0]) + \
+                                      ' Long:' + str(data_globals.CURRENT_LAT_LONG_G[1])
                         self.bluetooth_comm.write(send_stream)
                     else:
                         print(read)
-                        TARGET_LAT_LONG_G[1] = int(read[0])
-                        TARGET_LAT_LONG_G[0] = int(read[1])
-                        print(TARGET_LAT_LONG_G[1])
-                        print(TARGET_LAT_LONG_G[0])
+                        data_globals.TARGET_LAT_LONG_G[1] = int(read[0])
+                        data_globals.TARGET_LAT_LONG_G[0] = int(read[1])
+                        print(data_globals.TARGET_LAT_LONG_G[1])
+                        print(data_globals.TARGET_LAT_LONG_G[0])
                 except:
                     print("No (new) values from bluetooth")
             except:
@@ -213,7 +189,7 @@ if __name__ == "__main__":
     COM = CommsThread()
 
     atexit.register(clean_up_data)
-    atexit.register(clean_up_comms)
+    atexit.register(clean_up_comms, COM.ble_periph)
     atexit.register(clean_up_control, CTL.esc)
 
     DAQ.start()

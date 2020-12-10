@@ -24,7 +24,7 @@ class BLEPeripheral:
         """
         print('on -> stateChange: ' + state)
         if state == 'poweredOn':
-            self.bleno.startAdvertising('echo', ['ec00'])
+            self.bleno.startAdvertising('boat_data', ['ec00'])
         else:
             self.bleno.stopAdvertising()
 

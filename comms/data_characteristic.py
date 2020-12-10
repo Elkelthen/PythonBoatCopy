@@ -3,6 +3,7 @@ Characteristic for beaconing data about the boat.
 """
 import array
 from pybleno import Characteristic
+import data_globals
 
 
 class DataCharacteristic(Characteristic):
@@ -21,6 +22,8 @@ class DataCharacteristic(Characteristic):
         self._update_value_callback = None
 
     def onReadRequest(self, offset, callback):
+        self._value = array.array('B', [data_globals.CURRENT_LAT_LONG_G[0],
+                                        data_globals.CURRENT_LAT_LONG_G[1]])
         print('EchoCharacteristic - %s - onReadRequest: value = %s' %
               (self['uuid'], [hex(c) for c in self._value]))
         callback(Characteristic.RESULT_SUCCESS, self._value[offset:])
