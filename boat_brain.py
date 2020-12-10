@@ -13,24 +13,23 @@ from control.servo import Servo
 from control.esc import ESC
 from daq.data_acquisition import AccelerometerCompass, GPS
 from comms.bluetooth_comms import BluetoothComms as BC
-
-
+from comms.ble_peripheral import BLEPeripheral
 
 ############################### GLOBAL VARIABLES ######################################
 
 ACC_G = 0
 HEADING_G = 0
 
-#(Long, Lat) (X, Y)
+# (Long, Lat) (X, Y)
 CURRENT_LAT_LONG_G = [10, 10]
 TARGET_LAT_LONG_G = [0, 0]
-
 
 ############################## END GLOBAL VARIABLES ###################################
 
 ################################### FLAGS #############################################
 
 NEW_INFO_F = False
+
 
 ################################ END FLAGS ############################################
 
@@ -71,6 +70,7 @@ class DataThread(threading.Thread):
 
                 NEW_INFO_F = True
 
+
 class ControlThread(threading.Thread):
     """
     Initialize Control Thread
@@ -108,12 +108,10 @@ class ControlThread(threading.Thread):
 
         while True:
             if NEW_INFO_F:
-
                 # Front Assembly
                 AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
                                          self.motor_control_x, self.motor_control_y)
                 AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc)
-
 
                 # Rear Assembly
                 AMC.set_thrust_direction(HEADING_G, TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G,
@@ -121,6 +119,7 @@ class ControlThread(threading.Thread):
                 AMC.set_thrust_speed(TARGET_LAT_LONG_G, CURRENT_LAT_LONG_G, self.esc_back)
 
                 NEW_INFO_F = False
+
 
 class CommsThread(threading.Thread):
     """
@@ -134,6 +133,9 @@ class CommsThread(threading.Thread):
     def run(self):
 
         global TARGET_LAT_LONG_G
+
+        # Adding this to remember where it goes later.
+        ble_periph = BLEPeripheral()
 
         while True:
             try:
@@ -155,14 +157,14 @@ class CommsThread(threading.Thread):
                         pass
                     elif 'S' in read[0]:
                         # ESC.setSpeed(int(read[0].replace('S', '')))
-                        # TODO: MANUAL SPEED control ACROSS THREADS
+                        # TODO: MANUAL SPEED CONTROL ACROSS THREADS
                         pass
                     elif 'GET' in read[0]:
-                        send_stream = 'Heading:' + str(HEADING_G) +\
-                                     ' GoX:' + str(TARGET_LAT_LONG_G[1]) +\
-                                     ' GoY:' + str(TARGET_LAT_LONG_G[0]) +\
-                                     ' Lat:' + str(CURRENT_LAT_LONG_G[0]) +\
-                                     ' Long:' + str(CURRENT_LAT_LONG_G[1])
+                        send_stream = 'Heading:' + str(HEADING_G) + \
+                                      ' GoX:' + str(TARGET_LAT_LONG_G[1]) + \
+                                      ' GoY:' + str(TARGET_LAT_LONG_G[0]) + \
+                                      ' Lat:' + str(CURRENT_LAT_LONG_G[0]) + \
+                                      ' Long:' + str(CURRENT_LAT_LONG_G[1])
                         self.bluetooth_comm.write(send_stream)
                     else:
                         print(read)
@@ -175,9 +177,10 @@ class CommsThread(threading.Thread):
             except:
                 pass
 
-#Putting these cleanup methods here because I need to make sure
-#The Control ESC will always stop spinning if the program exits.
-#The others will probably come in handy at some point.
+
+# Putting these cleanup methods here because I need to make sure
+# The Control ESC will always stop spinning if the program exits.
+# The others will probably come in handy at some point.
 
 def clean_up_data():
     """
@@ -194,7 +197,9 @@ def clean_up_control(esc):
     """
     esc.reset()
 
-def clean_up_comms():
+
+def clean_up_comms(BLE):
+    BLE.clean_up()
     """
     Clean up communications at end of program.
     :return:
