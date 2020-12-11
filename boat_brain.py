@@ -13,8 +13,7 @@ from control import automatic_motor_control as AMC
 from control.servo import Servo
 from control.esc import ESC
 from daq.data_acquisition import AccelerometerCompass, GPS
-from comms.bluetooth_comms import BluetoothComms as BC
-from comms.ble_peripheral import BLEPeripheral
+from comms.ble_radio import BLERadio
 
 
 class DataThread(threading.Thread):
@@ -37,11 +36,11 @@ class DataThread(threading.Thread):
             current_long = self.gps.get_long()
 
             if not data_globals.NEW_INFO_F:
-                if acc != ACC_G:
-                    ACC_G = acc
+                if acc != data_globals.ACC_G:
+                    data_globals.ACC_G = acc
                     print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" % (acc[0], acc[1], acc[2]))
-                if heading != HEADING_G:
-                    HEADING_G = heading
+                if heading != data_globals.HEADING_G:
+                    data_globals.HEADING_G = heading
                     print("Heading %.3f degrees\n" % (heading))
                 if current_lat != data_globals.CURRENT_LAT_LONG_G[0]:
                     data_globals.CURRENT_LAT_LONG_G[1] = current_lat
@@ -50,7 +49,7 @@ class DataThread(threading.Thread):
                     data_globals.CURRENT_LAT_LONG_G[0] = current_long
                     print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
 
-                NEW_INFO_F = True
+                data_globals.NEW_INFO_F = True
 
 
 class ControlThread(threading.Thread):
@@ -108,51 +107,20 @@ class CommsThread(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
-        self.bluetooth_comm = None
-        self.ble_periph = BLEPeripheral()
+        self.ble_comm = BLERadio()
 
     def run(self):
-
         while True:
-            try:
-                # Bluetooth Serial Comms
-                if self.bluetooth_comm is None:
-                    self.bluetooth_comm = BC()
-            except Exception as error:
-                print(str(error))
-                print("No device")
+            if data_globals.NEW_INFO_F:
 
-            try:
-                time.sleep(1)
-                print("\n\n\n\n\n")
-                # Read input from Bluetooth Comms
-                try:
-                    print("Trying")
-                    read = self.bluetooth_comm.read().split(" ")
-                    if read is None:
-                        pass
-                    elif 'S' in read[0]:
-                        # ESC.setSpeed(int(read[0].replace('S', '')))
-                        # TODO: MANUAL SPEED CONTROL ACROSS THREADS
-                        pass
-                    elif 'GET' in read[0]:
-                        send_stream = 'Heading:' + str(data_globals.HEADING_G) + \
-                                      ' GoX:' + str(data_globals.TARGET_LAT_LONG_G[1]) + \
-                                      ' GoY:' + str(data_globals.TARGET_LAT_LONG_G[0]) + \
-                                      ' Lat:' + str(data_globals.CURRENT_LAT_LONG_G[0]) + \
-                                      ' Long:' + str(data_globals.CURRENT_LAT_LONG_G[1])
-                        self.bluetooth_comm.write(send_stream)
-                    else:
-                        print(read)
-                        data_globals.TARGET_LAT_LONG_G[1] = int(read[0])
-                        data_globals.TARGET_LAT_LONG_G[0] = int(read[1])
-                        print(data_globals.TARGET_LAT_LONG_G[1])
-                        print(data_globals.TARGET_LAT_LONG_G[0])
-                except:
-                    print("No (new) values from bluetooth")
-            except:
-                pass
+                # send
+                send_str = str(data_globals.CURRENT_LAT_LONG_G[0]) + " " + str(data_globals.CURRENT_LAT_LONG_G[1])
+                self.ble_comm.send(send_str)
 
+                # receive
+                from_others = self.ble_comm.rcv()
+                if from_others is not None:
+                    print(str(from_others))
 
 # Putting these cleanup methods here because I need to make sure
 # The Control ESC will always stop spinning if the program exits.
@@ -174,8 +142,7 @@ def clean_up_control(esc):
     esc.reset()
 
 
-def clean_up_comms(BLE):
-    BLE.clean_up()
+def clean_up_comms():
     """
     Clean up communications at end of program.
     :return:
@@ -189,7 +156,7 @@ if __name__ == "__main__":
     COM = CommsThread()
 
     atexit.register(clean_up_data)
-    atexit.register(clean_up_comms, COM.ble_periph)
+    atexit.register(clean_up_comms)
     atexit.register(clean_up_control, CTL.esc)
 
     DAQ.start()
