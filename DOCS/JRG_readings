@@ -12,4 +12,22 @@ BLE Stuff:
 
 Updated: All of the above is good, but this is the direction we're going.
     https://circuitpython.readthedocs.io/projects/ble_radio/en/latest/
+    Man don't I wish. It would appear, however, that we can't use this because it only works with the right boards?
+    Thanks, adafruit. back to pybleno I guess.
 
+Since we don't have access to Central-type methods from the pybleno library, we need another library to handle that stuff
+    https://ianharvey.github.io/bluepy-doc/ <- bluepy is pretty official anyway and fills in the gaps from pybleno...
+
+IMPORTANT: I was trying for quite some time to get bluepy working. I figured out why it wasn't... I had named my file bluepy.py
+           You can't do that, as is now obvious to me, or importing that name will attempt to import the file with which you are
+           working. Which doesn't have the object you want to use... Sometimes my idiocy is overwhelming lol.
+
+Comms:
+    ID: 1 byte
+    LAT/LONG: 8 Each = 16
+
+    Padding = 4
+    Timestamp = Calculated by the local Pi.
+
+Install ble-serial ("pip3 install ble-serial") So that hopefully we can use a virtual ble port.
+Currently, scanning and advertising are trying to happen on the same port, which blocks, which sucks.

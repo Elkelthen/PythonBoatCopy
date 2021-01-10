@@ -3,6 +3,7 @@
 Lower level control functions for the speed control of the boat.
 
 """
+import time
 
 
 # Class to control VSDs through the use of ESCs.
@@ -24,6 +25,10 @@ class ESC():
         Reset ESC. This should be followed by a series of beeps. This is calibration.
         :return:
         """
+        self.kit.continuous_servo[self.pin].throttle = -1
+        time.sleep(5)
+        self.kit.continuous_servo[self.pin].throttle = 1
+        time.sleep(5)
         self.kit.continuous_servo[self.pin].throttle = -1
 
     def set_speed(self, speed):

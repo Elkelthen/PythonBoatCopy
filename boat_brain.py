@@ -3,17 +3,17 @@
 This is the main file for the project. Running this should start the boat.
 
 """
-
+import random
 import time
 import threading
 import atexit
-import data_globals
 from adafruit_servokit import ServoKit
+import data_globals
 from control import automatic_motor_control as AMC
-from control.servo import Servo
-from control.esc import ESC
+from control.thruster_module import Thruster
 from daq.data_acquisition import AccelerometerCompass, GPS
-from comms.ble_radio import BLERadio
+from comms.ble_central import Central
+from comms.ble_peripheral import BLEPeripheral
 
 
 class DataThread(threading.Thread):
@@ -63,41 +63,32 @@ class ControlThread(threading.Thread):
         # Initialize ServoKit for PWM Hat
         self.kit = ServoKit(channels=16)
 
-        # Initialize Servos
-        self.motor_control_x = Servo(2, self.kit, False)
-        self.motor_control_x.reset()
-
-        self.motor_control_y = Servo(3, self.kit, False)
-        self.motor_control_y.reset()
-
-        self.motor_control_x_back = Servo(4, self.kit, True)
-        self.motor_control_x_back.reset()
-
-        self.motor_control_y_back = Servo(5, self.kit, True)
-        self.motor_control_y_back.reset()
-
-        # Initialize ESC
-        self.esc = ESC(0, self.kit)
-        self.esc.reset()
-
-        self.esc_back = ESC(1, self.kit)
-        self.esc_back.reset()
+        self.front_thruster = Thruster(self.kit, 0, 2, 3, 111, 79, 97, 71)
+        self.back_thruster = Thruster(self.kit, 1, 4, 5, 94, 67, 107, 80)
 
     def run(self):
 
         while True:
             if data_globals.NEW_INFO_F:
                 # Front Assembly
-                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G,
-                                         self.motor_control_x, self.motor_control_y)
-                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G, self.esc)
+                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
+                                         data_globals.CURRENT_LAT_LONG_G,
+                                         self.front_thruster.motor_control_x,
+                                         self.front_thruster.motor_control_y)
+                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+                                     data_globals.CURRENT_LAT_LONG_G,
+                                     self.front_thruster.esc)
 
                 # Rear Assembly
-                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G,
-                                         self.motor_control_x_back, self.motor_control_y_back)
-                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G, data_globals.CURRENT_LAT_LONG_G, self.esc_back)
+                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
+                                         data_globals.CURRENT_LAT_LONG_G,
+                                         self.back_thruster.motor_control_x,
+                                         self.back_thruster.motor_control_y)
+                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+                                     data_globals.CURRENT_LAT_LONG_G,
+                                     self.back_thruster.esc)
 
-                NEW_INFO_F = False
+                data_globals.NEW_INFO_F = False
 
 
 class CommsThread(threading.Thread):
@@ -106,21 +97,37 @@ class CommsThread(threading.Thread):
     """
 
     def __init__(self):
+        """
+        Set up for the loop
+        """
         threading.Thread.__init__(self)
-        self.ble_comm = BLERadio()
+        self.ble_comm_in = Central()
+        self.ble_comm_out = BLEPeripheral()
 
     def run(self):
+        """
+        Advertising and Scanning both block, so I've put in a random delay in the advertising
+        (between 1 and 3 seconds) so that there is a higher chance that one boat is advertising
+        while the other is scanning, and they can actually pass their information along.
+        It seems to work very well, from my testing.
+        """
         while True:
-            if data_globals.NEW_INFO_F:
+            # send
+            try:
+                self.ble_comm_out.turn_on()
+                time.sleep(random.randint(1, 3))
+            except BlockingIOError:
+                print("IO BLOCK")
 
-                # send
-                send_str = str(data_globals.CURRENT_LAT_LONG_G[0]) + " " + str(data_globals.CURRENT_LAT_LONG_G[1])
-                self.ble_comm.send(send_str)
+            # receive
+            self.ble_comm_out.turn_off()
 
-                # receive
-                from_others = self.ble_comm.rcv()
-                if from_others is not None:
-                    print(str(from_others))
+            self.ble_comm_in.scan_for_devices(1)
+            if self.ble_comm_in.connection_list is not None:
+                self.ble_comm_in.get_scan_info()
+            else:
+                print("Found 0 Devices.")
+
 
 # Putting these cleanup methods here because I need to make sure
 # The Control ESC will always stop spinning if the program exits.
@@ -157,7 +164,7 @@ if __name__ == "__main__":
 
     atexit.register(clean_up_data)
     atexit.register(clean_up_comms)
-    atexit.register(clean_up_control, CTL.esc)
+    atexit.register(clean_up_control, CTL.front_thruster.esc)
 
     DAQ.start()
     CTL.start()

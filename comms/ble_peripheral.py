@@ -2,6 +2,7 @@
 BLE beaconing class, uses data_characteristic.py for the actual information of the class.
 """
 
+import data_globals
 from pybleno import Bleno, BlenoPrimaryService
 from .data_characteristic import DataCharacteristic
 
@@ -12,28 +13,35 @@ class BLEPeripheral:
     """
 
     def __init__(self):
+        """
+        Basic initializations and bindings.
+        """
         self.bleno = Bleno()
-        self.bleno.on('stateChange', self.on_state_change)
         self.bleno.on('advertisingStart', self.on_advertising_start)
         self.bleno.start()
 
-    def on_state_change(self, state):
+    def turn_on(self):
         """
-        :param state On or Off:
-        :return:
+        Begin advertising
         """
-        print('on -> stateChange: ' + state)
-        if state == 'poweredOn':
-            self.bleno.startAdvertising('boat_data', ['ec00'])
-        else:
-            self.bleno.stopAdvertising()
+        self.bleno.state = "poweredOn"
+        ad_string = "boat_data " + \
+                    str(data_globals.CURRENT_LAT_LONG_G[0]) + \
+                    str(data_globals.CURRENT_LAT_LONG_G[1])
+        self.bleno.startAdvertising(ad_string, ['ec00'])
+
+    def turn_off(self):
+        """
+        End advertising.
+        """
+        self.bleno.state = "poweredOff"
+        self.bleno.stopAdvertising()
 
     def on_advertising_start(self, error):
         """
-        :param error:
-        :return:
+        This binding is necessary for the library or I wouldn't keep it.
+        The whole bindings system is a serious PITA.
         """
-        print('on -> advertisingStart: ' + ('error ' + error if error else 'success'))
         if not error:
             self.bleno.setServices([
                 BlenoPrimaryService({
@@ -46,8 +54,7 @@ class BLEPeripheral:
 
     def clean_up(self):
         """
-        quit advertising
-        :return:
+        quit
         """
         self.bleno.stopAdvertising()
         self.bleno.disconnect()

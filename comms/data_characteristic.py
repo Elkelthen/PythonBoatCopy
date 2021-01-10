@@ -14,7 +14,7 @@ class DataCharacteristic(Characteristic):
     def __init__(self, uuid):
         Characteristic.__init__(self, {
             'uuid': uuid,
-            'properties': ['read', 'notify'],
+            'properties': ['read', 'write', 'notify'],
             'value': None
         })
 
@@ -22,11 +22,19 @@ class DataCharacteristic(Characteristic):
         self._update_value_callback = None
 
     def onReadRequest(self, offset, callback):
-        self._value = array.array('B', [data_globals.CURRENT_LAT_LONG_G[0],
-                                        data_globals.CURRENT_LAT_LONG_G[1]])
-        print('EchoCharacteristic - %s - onReadRequest: value = %s' %
-              (self['uuid'], [hex(c) for c in self._value]))
-        callback(Characteristic.RESULT_SUCCESS, self._value[offset:])
+        try:
+            self._value = array.array('B', [data_globals.CURRENT_LAT_LONG_G[0],
+                                            data_globals.CURRENT_LAT_LONG_G[1]])
+            print('EchoCharacteristic - %s - onReadRequest: value = %s' %
+                  (self['uuid'], [hex(c) for c in self._value]))
+            callback(Characteristic.RESULT_SUCCESS, self._value[offset:])
+        except OverflowError:
+            print("UNKNOWN LOCATION")
+            self._value = array.array('B', [0, 0])
+            print('EchoCharacteristic - %s - onReadRequest: value = %s' %
+                  (self['uuid'], [hex(c) for c in self._value]))
+            callback(Characteristic.RESULT_SUCCESS, self._value[offset:])
+
 
     def onWriteRequest(self, data, offset, withoutResponse, callback):
         self._value = data
