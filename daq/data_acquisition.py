@@ -71,7 +71,13 @@ class GPS():
         """
         :return: lat and long values from GPS chip
         """
-        self.gps.get_lat_long()
+        try:
+            self.gps.read()  # Read from GPS
+        except IndexError:
+            print("Unable to read")
+        except:
+            print("String Empty")
+
 
     def get_lat(self):
         """

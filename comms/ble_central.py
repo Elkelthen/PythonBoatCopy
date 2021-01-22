@@ -73,8 +73,9 @@ class Central:
                 if "boat_controller" in value:
                     # This should be set to receive the correct values from a phone.
                     print("Setting course")
-                    data_globals.TARGET_LAT_LONG_G[1] = 10
-                    data_globals.TARGET_LAT_LONG_G[0] = 10
+                    value = value.split()
+                    data_globals.TARGET_LAT_LONG_G[1] = float(value[1])
+                    data_globals.TARGET_LAT_LONG_G[0] = float(value[2])
 
                 if "boat_main" in value:
                     # This should be set to receive the correct values from boat_main.

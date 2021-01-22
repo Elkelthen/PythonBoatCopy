@@ -24,32 +24,37 @@ class DataThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.accel_compass = AccelerometerCompass()
-        self.gps = GPS()
 
     def run(self):
 
         while True:
-            acc = self.accel_compass.get_accel_all()
-            heading = self.accel_compass.get_compass_heading()
+            data_globals.ACC_G = self.accel_compass.get_accel_all()
+            data_globals.HEADING_G = self.accel_compass.get_compass_heading()
+            time.sleep(0.1)
+
+
+class GPSThread(threading.Thread):
+    """
+    Initialize GPS Thread.
+    This is necessary because the GPS takes a LONG time to read
+    relative to the other sensors, but we can't have it block the
+    rest of the program or responsiveness goes way down, so it gets
+    its own thread. Lucky Duck.
+    """
+
+    def __init__(self):
+        """
+        Initialize GPS objects.
+        """
+        threading.Thread.__init__(self)
+        self.gps = GPS()
+
+    def run(self):
+        while True:
             self.gps.read()
-            current_lat = self.gps.get_lat()
-            current_long = self.gps.get_long()
-
-            if not data_globals.NEW_INFO_F:
-                if acc != data_globals.ACC_G:
-                    data_globals.ACC_G = acc
-                    print("Acceleration of X,Y,Z is %.3fg, %.3fg, %.3fg" % (acc[0], acc[1], acc[2]))
-                if heading != data_globals.HEADING_G:
-                    data_globals.HEADING_G = heading
-                    print("Heading %.3f degrees\n" % (heading))
-                if current_lat != data_globals.CURRENT_LAT_LONG_G[0]:
-                    data_globals.CURRENT_LAT_LONG_G[1] = current_lat
-                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
-                if current_long != data_globals.CURRENT_LAT_LONG_G[1]:
-                    data_globals.CURRENT_LAT_LONG_G[0] = current_long
-                    print("Lat: %.3fg \t Long: %.3fg" % (self.gps.get_lat(), self.gps.get_long()))
-
-                data_globals.NEW_INFO_F = True
+            data_globals.CURRENT_LAT_LONG_G[1] = self.gps.get_lat()
+            data_globals.CURRENT_LAT_LONG_G[0] = self.gps.get_long()
+            time.sleep(1)
 
 
 class ControlThread(threading.Thread):
@@ -63,32 +68,31 @@ class ControlThread(threading.Thread):
         # Initialize ServoKit for PWM Hat
         self.kit = ServoKit(channels=16)
 
-        self.front_thruster = Thruster(self.kit, 0, 2, 3, 111, 79, 97, 71)
-        self.back_thruster = Thruster(self.kit, 1, 4, 5, 94, 67, 107, 80)
+        self.front_thruster = Thruster(self.kit, 0, 2, 3, 110, 80, 95, 65)
+        self.back_thruster = Thruster(self.kit, 1, 4, 5, 100, 70, 112, 82)
 
     def run(self):
 
         while True:
-            if data_globals.NEW_INFO_F:
-                # Front Assembly
-                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
-                                         data_globals.CURRENT_LAT_LONG_G,
-                                         self.front_thruster.motor_control_x,
-                                         self.front_thruster.motor_control_y)
-                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+            # Front Assembly
+            AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
                                      data_globals.CURRENT_LAT_LONG_G,
-                                     self.front_thruster.esc)
+                                     self.front_thruster.motor_control_x,
+                                     self.front_thruster.motor_control_y)
+            AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+                                 data_globals.CURRENT_LAT_LONG_G,
+                                 self.front_thruster.esc)
 
-                # Rear Assembly
-                AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
-                                         data_globals.CURRENT_LAT_LONG_G,
-                                         self.back_thruster.motor_control_x,
-                                         self.back_thruster.motor_control_y)
-                AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+            # Rear Assembly
+            AMC.set_thrust_direction(data_globals.HEADING_G, data_globals.TARGET_LAT_LONG_G,
                                      data_globals.CURRENT_LAT_LONG_G,
-                                     self.back_thruster.esc)
+                                     self.back_thruster.motor_control_x,
+                                     self.back_thruster.motor_control_y)
+            AMC.set_thrust_speed(data_globals.TARGET_LAT_LONG_G,
+                                 data_globals.CURRENT_LAT_LONG_G,
+                                 self.back_thruster.esc)
 
-                data_globals.NEW_INFO_F = False
+            time.sleep(0.1)
 
 
 class CommsThread(threading.Thread):
@@ -140,13 +144,14 @@ def clean_up_data():
     """
 
 
-def clean_up_control(esc):
+def clean_up_control(esc, esc1):
     """
     Clean up Control Process at end of program
     :param esc:
     :return:
     """
     esc.reset()
+    esc1.reset()
 
 
 def clean_up_comms():
@@ -161,14 +166,16 @@ if __name__ == "__main__":
     DAQ = DataThread()
     CTL = ControlThread()
     COM = CommsThread()
+    GPS = GPSThread()
 
     atexit.register(clean_up_data)
     atexit.register(clean_up_comms)
-    atexit.register(clean_up_control, CTL.front_thruster.esc)
+    atexit.register(clean_up_control, CTL.front_thruster.esc, CTL.back_thruster.esc)
 
     DAQ.start()
     CTL.start()
     COM.start()
+    GPS.start()
 
     # Keep the program running. If this isn't here we instantly exit.
     while 1:
