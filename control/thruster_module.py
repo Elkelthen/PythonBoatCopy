@@ -24,7 +24,7 @@ class Thruster:
         :param min_move_2:
         """
         self.motor_control_x = Servo(servo_x, kit, False, max_move_1, min_move_1)
-        self.motor_control_y = Servo(servo_y, kit, False, max_move_2, min_move_2)
+        self.motor_control_y = Servo(servo_y, kit, True, max_move_2, min_move_2)
         self.esc = ESC(esc, kit)
 
         self.calibrate()

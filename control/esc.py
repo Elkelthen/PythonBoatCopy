@@ -26,9 +26,16 @@ class ESC():
         :return:
         """
         self.kit.continuous_servo[self.pin].throttle = -1
-        time.sleep(5)
+        time.sleep(1)
         self.kit.continuous_servo[self.pin].throttle = 1
-        time.sleep(5)
+        time.sleep(1)
+        self.kit.continuous_servo[self.pin].throttle = -1
+
+    def stop(self):
+        """
+        set speed to 0
+        :return: None
+        """
         self.kit.continuous_servo[self.pin].throttle = -1
 
     def set_speed(self, speed):

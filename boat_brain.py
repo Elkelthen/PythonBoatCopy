@@ -3,6 +3,7 @@
 This is the main file for the project. Running this should start the boat.
 
 """
+import os
 import random
 import time
 import threading
@@ -26,11 +27,11 @@ class DataThread(threading.Thread):
         self.accel_compass = AccelerometerCompass()
 
     def run(self):
-
+        i = 0
         while True:
             data_globals.ACC_G = self.accel_compass.get_accel_all()
             data_globals.HEADING_G = self.accel_compass.get_compass_heading()
-            time.sleep(0.1)
+            time.sleep(0.01)
 
 
 class GPSThread(threading.Thread):
@@ -52,8 +53,8 @@ class GPSThread(threading.Thread):
     def run(self):
         while True:
             self.gps.read()
-            data_globals.CURRENT_LAT_LONG_G[1] = self.gps.get_lat()
-            data_globals.CURRENT_LAT_LONG_G[0] = self.gps.get_long()
+            data_globals.CURRENT_LAT_LONG_G[0] = self.gps.get_lat()
+            data_globals.CURRENT_LAT_LONG_G[1] = self.gps.get_long()
             time.sleep(1)
 
 
@@ -68,7 +69,7 @@ class ControlThread(threading.Thread):
         # Initialize ServoKit for PWM Hat
         self.kit = ServoKit(channels=16)
 
-        self.front_thruster = Thruster(self.kit, 0, 2, 3, 110, 80, 95, 65)
+        self.front_thruster = Thruster(self.kit, 0, 2, 3, 142, 112, 100, 70)
         self.back_thruster = Thruster(self.kit, 1, 4, 5, 100, 70, 112, 82)
 
     def run(self):
@@ -150,8 +151,8 @@ def clean_up_control(esc, esc1):
     :param esc:
     :return:
     """
-    esc.reset()
-    esc1.reset()
+    esc.stop()
+    esc1.stop()
 
 
 def clean_up_comms():
@@ -179,4 +180,14 @@ if __name__ == "__main__":
 
     # Keep the program running. If this isn't here we instantly exit.
     while 1:
+        os.system("clear")
+        print("HEADING: ", data_globals.HEADING_G)
+        print("THEADING: ", data_globals.TARGET_HEADING_G)
+        print("TLONG: ", data_globals.TARGET_LAT_LONG_G[0])
+        print("TLAT: ", data_globals.TARGET_LAT_LONG_G[1])
+        print("CLONG: ", data_globals.CURRENT_LAT_LONG_G[0])
+        print("CLAT: ", data_globals.CURRENT_LAT_LONG_G[1])
+        print("ACC: ", data_globals.ACC_G)
+        print("ANGLES: ", data_globals.SERVO_ANGLES_G)
+        #print("HEADINGS_FILTERED: ", data_globals.HEADING_FILTERED_G)
         time.sleep(1)

@@ -9,6 +9,7 @@ Accessed by boat_brain.py
 
 import math
 import geopy.distance
+import data_globals
 
 
 def set_thrust_direction(current_heading, go_to_coords, current_coords, servo_x, servo_y):
@@ -17,34 +18,21 @@ def set_thrust_direction(current_heading, go_to_coords, current_coords, servo_x,
     Takes input from boat_brain.py to calculate the necessary position of servos for VSD control.
 
     """
-    go_to_heading = 180 * (math.atan2(go_to_coords[1] - current_coords[1],
-                                      go_to_coords[0] - current_coords[0])) / math.pi
+    go_to_heading = (math.atan2(go_to_coords[1] - current_coords[1],
+                                    go_to_coords[0] - current_coords[0]))
 
-    theta = go_to_heading - current_heading
+    data_globals.TARGET_HEADING_G = go_to_heading
 
-    # Convert to radians
-    theta = theta * (math.pi / 180)
+    theta = (go_to_heading - current_heading) * (math.pi / 180)
 
     # Find the correct thrust vector
-    thrust_vector_x = math.cos(theta)
-    thrust_vector_y = math.tan(theta)
-
-    thrust_vector_x = thrust_vector_x * (180 / math.pi)
-    thrust_vector_y = thrust_vector_y * (180 / math.pi)
-
-    # Ensure a positive value for conversion in the next step.
-    if thrust_vector_x < 0:
-        thrust_vector_x += 360
-    if thrust_vector_y < 0:
-        thrust_vector_y += 360
-
-    # Convert the thrust vector to a range of degrees.
-    thrust_vector_x = range_conversion(thrust_vector_x, 360, 0, 180, 0)
-    thrust_vector_y = range_conversion(thrust_vector_y, 360, 0, 180, 0)
+    # Normalized between 0 and 1 (NOT degrees or radians)
+    thrust_unit_vector_x = math.cos(theta)
+    thrust_unit_vector_y = math.sin(theta)
 
     # Move the servos to the correct degree value.
-    servo_x.move(thrust_vector_x)
-    servo_y.move(thrust_vector_y)
+    servo_x.move(thrust_unit_vector_x)
+    servo_y.move(thrust_unit_vector_y)
 
 
 def set_thrust_speed(go_to_coords, current_coords, esc):

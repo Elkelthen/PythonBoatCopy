@@ -31,3 +31,5 @@ Comms:
 
 Install ble-serial ("pip3 install ble-serial") So that hopefully we can use a virtual ble port.
 Currently, scanning and advertising are trying to happen on the same port, which blocks, which sucks.
+
+Install smbus2

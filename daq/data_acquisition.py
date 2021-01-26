@@ -4,6 +4,8 @@ General sensor data getters
 
 from . import lsm303d
 from .grove_gps_data import GPS as g
+from lsm9ds1_rjg.lsm9ds1 import Driver as lsm9ds1
+from lsm9ds1_rjg import I2CTransport
 
 
 # Statics because Pylint says this is better
@@ -42,6 +44,9 @@ class AccelerometerCompass():
 
     def __init__(self):
         self.acc_mag = lsm303d.LSM303D()
+        # self.acc_mag = lsm9ds1(I2CTransport(1, I2CTransport.I2C_AG_ADDRESS),
+        #                        I2CTransport(1, I2CTransport.I2C_MAG_ADDRESS))
+        # self.acc_mag.configure()
 
     def get_accel_all(self):
         """
@@ -77,7 +82,6 @@ class GPS():
             print("Unable to read")
         except:
             print("String Empty")
-
 
     def get_lat(self):
         """
