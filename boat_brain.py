@@ -23,7 +23,7 @@ class DataThread(threading.Thread):
     """
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         self.accel_compass = AccelerometerCompass()
 
     def run(self):
@@ -47,7 +47,7 @@ class GPSThread(threading.Thread):
         """
         Initialize GPS objects.
         """
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
         self.gps = GPS()
 
     def run(self):
@@ -64,7 +64,7 @@ class ControlThread(threading.Thread):
     """
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, daemon=True)
 
         # Initialize ServoKit for PWM Hat
         self.kit = ServoKit(channels=16)
@@ -105,7 +105,7 @@ class CommsThread(threading.Thread):
         """
         Set up for the loop
         """
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self,daemon=True)
         self.ble_comm_in = Central()
         self.ble_comm_out = BLEPeripheral()
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     GPS.start()
 
     # Keep the program running. If this isn't here we instantly exit.
-    while 1:
+    while not data_globals.SHUTDOWN_F:
         os.system("clear")
         print("HEADING: ", data_globals.HEADING_G)
         print("THEADING: ", data_globals.TARGET_HEADING_G)

@@ -83,6 +83,10 @@ class Central:
                     data_globals.TARGET_LAT_LONG_G[1] = 10
                     data_globals.TARGET_LAT_LONG_G[0] = 10
 
+                if "shutdown" in value:
+                    data_globals.SHUTDOWN_F = True
+
+
 
 
 class ScanDelegate(DefaultDelegate):

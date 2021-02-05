@@ -16,3 +16,5 @@ SERVO_ANGLES_G = [0, 0, 0, 0]
 
 # Flags
 NEW_INFO_F = False
+
+SHUTDOWN_F = False
