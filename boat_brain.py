@@ -179,14 +179,16 @@ if __name__ == "__main__":
     GPS.start()
 
     data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
-    print('Starting home is:' data_globals.HOME_G)
+    print('Starting home is:', data_globals.HOME_G)
 
     # Keep the program running. If this isn't here we instantly exit.
     while not data_globals.SHUTDOWN_F:
         os.system("clear")
         if data_globals.SET_HOME_F:
             data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
-            print('Home is now:' data_globals.HOME_G)
+            if data_globals.HOMED_G == False:
+                print('Home is now:', data_globals.HOME_G)
+                data_globals.HOMED_G = True
         if data_globals.GO_HOME_F:
             data_globals.TARGET_LAT_LONG_G = data_globals.HOME_G
             print('We are going home')
