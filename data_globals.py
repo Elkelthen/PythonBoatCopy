@@ -11,6 +11,7 @@ TARGET_HEADING_G = 0
 # (Long, Lat) (X, Y)
 CURRENT_LAT_LONG_G = [10, 10]
 TARGET_LAT_LONG_G = [37.269, -76.716]
+HOME_G = [0,0]
 
 SERVO_ANGLES_G = [0, 0, 0, 0]
 
@@ -18,3 +19,7 @@ SERVO_ANGLES_G = [0, 0, 0, 0]
 NEW_INFO_F = False
 
 SHUTDOWN_F = False
+
+SET_HOME_F = False
+
+GO_HOME_F = False

@@ -85,7 +85,10 @@ class Central:
 
                 if "shutdown" in value:
                     data_globals.SHUTDOWN_F = True
-
+                if "set_home" in value:
+                    data_globals.SET_HOME_F = True
+                if "go_home" in value:
+                    data_globals.GO_HOME_F = True
 
 
 

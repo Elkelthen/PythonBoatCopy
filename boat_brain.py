@@ -178,9 +178,18 @@ if __name__ == "__main__":
     COM.start()
     GPS.start()
 
+    data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
+    print('Starting home is:' data_globals.HOME_G)
+
     # Keep the program running. If this isn't here we instantly exit.
     while not data_globals.SHUTDOWN_F:
         os.system("clear")
+        if data_globals.SET_HOME_F:
+            data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
+            print('Home is now:' data_globals.HOME_G)
+        if data_globals.GO_HOME_F:
+            data_globals.TARGET_LAT_LONG_G = data_globals.HOME_G
+            print('We are going home')
         print("HEADING: ", data_globals.HEADING_G)
         print("THEADING: ", data_globals.TARGET_HEADING_G)
         print("TLONG: ", data_globals.TARGET_LAT_LONG_G[0])
@@ -191,3 +200,5 @@ if __name__ == "__main__":
         print("ANGLES: ", data_globals.SERVO_ANGLES_G)
         #print("HEADINGS_FILTERED: ", data_globals.HEADING_FILTERED_G)
         time.sleep(1)
+
+
