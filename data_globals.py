@@ -7,7 +7,7 @@ ACC_G = 0
 HEADING_G = 0
 HEADING_FILTERED_G = [0] * 300
 TARGET_HEADING_G = 0
-H
+
 
 # (Long, Lat) (X, Y)
 CURRENT_LAT_LONG_G = [10, 10]
