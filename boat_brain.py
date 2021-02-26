@@ -31,6 +31,7 @@ class DataThread(threading.Thread):
         while True:
             data_globals.ACC_G = self.accel_compass.get_accel_all()
             data_globals.HEADING_G = self.accel_compass.get_compass_heading()
+            data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
             time.sleep(0.01)
 
 
@@ -178,7 +179,6 @@ if __name__ == "__main__":
     COM.start()
     GPS.start()
 
-    data_globals.HOME_G = data_globals.CURRENT_LAT_LONG_G
     print('Starting home is:', data_globals.HOME_G)
 
     # Keep the program running. If this isn't here we instantly exit.
@@ -191,6 +191,7 @@ if __name__ == "__main__":
                 data_globals.HOMED_G = True
         if data_globals.GO_HOME_F:
             data_globals.TARGET_LAT_LONG_G = data_globals.HOME_G
+            data_globals.GO_HOME_F = False
             print('We are going home')
         print("HEADING: ", data_globals.HEADING_G)
         print("THEADING: ", data_globals.TARGET_HEADING_G)

@@ -23,7 +23,8 @@ def set_thrust_direction(current_heading, go_to_coords, current_coords, servo_x,
 
     data_globals.TARGET_HEADING_G = go_to_heading
 
-    theta = (go_to_heading - current_heading) * (math.pi / 180)
+    theta = (go_to_heading - current_heading) * (math.pi / 180) + (math.pi / 4)
+    #adds 45 degrees to heading to correct for motor orientation
 
     # Find the correct thrust vector
     # Normalized between 0 and 1 (NOT degrees or radians)
