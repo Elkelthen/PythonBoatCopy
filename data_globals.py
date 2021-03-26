@@ -3,10 +3,12 @@ This file contains all of the global variables used in the program
 to help avoid cyclical dependencies.
 """
 # Variables
-ACC_G = 0
+ACC_G = []
 HEADING_G = 0
 HEADING_FILTERED_G = [0] * 300
 TARGET_HEADING_G = 0
+
+ACC_LIST_G = []
 
 
 # (Long, Lat) (X, Y)

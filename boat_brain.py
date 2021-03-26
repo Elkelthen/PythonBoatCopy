@@ -57,6 +57,15 @@ class GPSThread(threading.Thread):
             data_globals.CURRENT_LAT_LONG_G[0] = self.gps.get_lat()
             data_globals.CURRENT_LAT_LONG_G[1] = self.gps.get_long()
             time.sleep(1)
+            data_globals.ACC_LIST_G.insert(0, data_globals.ACC_G)
+            if len(data_globals.ACC_LIST_G) == 30:
+                stopped = 0
+                for i in data_globals.ACC_LIST_G:
+                    if i == [0,0,0]:
+                        stopped += 1
+                if stopped > 15:
+                    evasive_maneuvers(data_globals.TARGET_HEADING_G)
+                data_globals.ACC_LIST_G = []
 
 
 class ControlThread(threading.Thread):
